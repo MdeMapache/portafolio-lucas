@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { onDuckAudio } from "@/lib/audioBus";
 import { playClick, playHover, setSfxMuted } from "@/lib/sfx";
 
 const ENABLED_KEY = "portafolio:audio";
@@ -29,6 +30,8 @@ export default function AudioController() {
   const [enabled, setEnabled] = useState(true);
   const [volume, setVolume] = useState(DEFAULT_VOLUME);
   const [blocked, setBlocked] = useState(false);
+  /** Silencio temporal mientras corre un demo; no toca la preferencia guardada. */
+  const [ducked, setDucked] = useState(false);
 
   // Identidad de esta pestaña y canal con las demás. El id se genera dentro de
   // un efecto y no en el render: `Math.random()` en el cuerpo del componente es
@@ -110,14 +113,19 @@ export default function AudioController() {
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume]);
 
-  // Encendido y apagado.
+  // Pedidos de silencio temporal (ver lib/audioBus.ts).
+  useEffect(() => onDuckAudio(setDucked), []);
+
+  // Encendido y apagado. `ducked` se trata como un apagado temporal: cuando el
+  // demo termina, la música vuelve sola sin pisar la preferencia del usuario.
   useEffect(() => {
-    setSfxMuted(!enabled);
+    const active = enabled && !ducked;
+    setSfxMuted(!active);
 
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (!enabled) {
+    if (!active) {
       audio.pause();
       return;
     }
@@ -127,7 +135,7 @@ export default function AudioController() {
     if (document.hidden) return;
 
     startPlayback();
-  }, [enabled, startPlayback]);
+  }, [enabled, ducked, startPlayback]);
 
   // Si el autoplay quedó bloqueado, el primer gesto lo destraba.
   useEffect(() => {
@@ -155,7 +163,7 @@ export default function AudioController() {
 
       if (document.hidden) {
         audio.pause();
-      } else if (enabled) {
+      } else if (enabled && !ducked) {
         // Al volver al frente, esta pestaña reclama el audio para sí.
         startPlayback();
       }
@@ -163,7 +171,7 @@ export default function AudioController() {
 
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () => document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, [enabled, startPlayback]);
+  }, [enabled, ducked, startPlayback]);
 
   // Efectos de interfaz, delegados en document.
   useEffect(() => {
@@ -212,7 +220,7 @@ export default function AudioController() {
     }
   }
 
-  const playing = enabled && !blocked;
+  const playing = enabled && !blocked && !ducked;
   const percent = Math.round(volume * 100);
 
   return (
@@ -255,8 +263,13 @@ export default function AudioController() {
           className="w-20 sm:w-24 h-1 accent-cyber-cyan cursor-pointer"
         />
 
-        <span className="font-mono text-[9px] text-steam-dim w-7 text-right tabular-nums">
-          {blocked ? "···" : String(percent).padStart(3, "0")}
+        <span
+          className={`font-mono text-[9px] w-7 text-right tabular-nums ${
+            ducked ? "text-cyber-magenta" : "text-steam-dim"
+          }`}
+          title={ducked ? "Silenciada mientras corre un demo" : undefined}
+        >
+          {ducked ? "dmo" : blocked ? "···" : String(percent).padStart(3, "0")}
         </span>
       </div>
     </>
