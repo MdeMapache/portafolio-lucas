@@ -6,9 +6,10 @@ import { usePortfolio } from "@/components/PortfolioProvider";
 import AssetImage from "@/components/ui/AssetImage";
 import Panel from "@/components/ui/Panel";
 import ProgressBar from "@/components/ui/ProgressBar";
+import { accentFor } from "@/components/ui/accents";
 import type { Project } from "@/lib/portfolio/types";
 
-/** Enlace de acción de una tarjeta (demo o repositorio). */
+/** Enlace de acción con borde neón y flecha de salida. */
 function ActionLink({
   href,
   children,
@@ -23,13 +24,13 @@ function ActionLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`px-3 py-1.5 text-[11.5px] font-display uppercase tracking-wide border transition-all hover:-translate-y-px ${
+      className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border transition-all hover:-translate-y-px ${
         primary
-          ? "border-steam-link text-white bg-gradient-to-b from-[#2a5a7a] to-[#1c3c52] hover:from-[#347399] hover:to-[#25516f]"
-          : "border-steam-line text-steam-dim hover:text-steam-bright hover:border-steam-link"
+          ? "border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan/10 hover:shadow-neon-cyan"
+          : "border-steam-dim/40 text-steam-dim hover:border-cyber-magenta hover:text-cyber-magenta hover:shadow-neon-magenta"
       }`}
     >
-      {children}
+      {children} ↗
     </a>
   );
 }
@@ -41,7 +42,7 @@ function TechChips({ tech }: { tech: string[] }) {
       {tech.map((t) => (
         <span
           key={t}
-          className="text-[10px] px-2 py-0.5 font-mono text-steam-dim border border-steam-line/70"
+          className="font-mono text-[9px] px-1.5 py-0.5 text-steam-dim border border-steam-dim/25 tracking-wider uppercase"
         >
           {t}
         </span>
@@ -57,9 +58,13 @@ function Screenshots({ ids }: { ids: string[] }) {
       {ids.map((id) => (
         <div
           key={id}
-          className="w-32 h-20 border border-steam-line overflow-hidden bg-steam-bgDeep transition-transform hover:scale-105"
+          className="w-32 h-20 border border-cyber-cyan/25 overflow-hidden bg-black transition-all hover:border-cyber-cyan hover:shadow-neon-cyan"
         >
-          <AssetImage assetId={id} alt="Captura del proyecto" className="w-full h-full object-cover" />
+          <AssetImage
+            assetId={id}
+            alt="Captura del proyecto"
+            className="w-full h-full object-cover"
+          />
         </div>
       ))}
     </div>
@@ -71,58 +76,72 @@ function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean
   const pct = project.total > 0 ? Math.round((project.done / project.total) * 100) : 0;
 
   return (
-    <article className="border border-steam-link/40 bg-gradient-to-br from-steam-panel2/80 to-steam-panel p-5 mb-4">
-      <div className="flex items-start gap-4">
-        <div className="w-16 h-16 shrink-0 flex items-center justify-center bg-steam-panel2 border border-steam-line text-3xl">
+    <article className="group relative corner-frame border border-cyber-cyan/50 text-cyber-cyan bg-cyber-void/50 p-5 mb-3 transition-all duration-200 hover:shadow-neon-cyan">
+      <span className="scan-sweep" />
+
+      <div className="flex items-start gap-3.5">
+        <div className="w-14 h-14 shrink-0 flex items-center justify-center border border-cyber-cyan/35 bg-cyber-void text-2xl">
           {project.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <h3 className="text-steam-bright text-lg font-semibold">{project.title}</h3>
-            <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 border border-steam-gold text-steam-gold">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span className="font-mono text-[9.5px]">[TOP]</span>
+            <h3
+              data-text={project.title}
+              className="glitch font-display text-[17px] uppercase tracking-wide text-steam-bright"
+            >
+              {project.title}
+            </h3>
+            <span className="font-mono text-[8.5px] uppercase px-1.5 py-0.5 border border-cyber-magenta text-cyber-magenta neon-pulse">
               destacado
             </span>
           </div>
-          <p className="text-[13px] text-steam-dim mb-2">{project.description}</p>
+          <p className="font-mono text-[11px] text-steam-dim mb-2 leading-relaxed">
+            {project.description}
+          </p>
           <TechChips tech={project.tech} />
         </div>
       </div>
 
       {project.longDescription ? (
-        <p className="text-[12.5px] leading-relaxed text-steam-text/85 mt-3.5">
+        <p className="text-[12.5px] leading-relaxed text-steam-text/85 mt-4 pt-3.5 border-t border-cyber-cyan/15">
           {project.longDescription}
         </p>
       ) : null}
 
       <Screenshots ids={project.screenshotAssetIds} />
 
-      <div className="flex items-center gap-2.5 mt-4 flex-wrap">
+      <div className="flex items-center gap-2 mt-4 flex-wrap">
         {project.demoUrl ? (
           <ActionLink href={project.demoUrl} primary>
             Demo en vivo
           </ActionLink>
         ) : null}
         {project.repoUrl ? <ActionLink href={project.repoUrl}>Código</ActionLink> : null}
-        {/* El recordatorio es para vos; al visitante sólo le muestra un hueco. */}
         {!project.demoUrl && !project.repoUrl && isOwner ? (
-          <span className="text-[11px] font-mono text-steam-dim/70">
-            Sin enlaces todavía — agregalos desde Modificar perfil → Proyectos.
+          <span className="font-mono text-[9.5px] text-steam-dim/60">
+            Sin enlaces — cargalos en Modificar perfil → Proyectos.
           </span>
         ) : null}
       </div>
 
       <div className="flex items-center gap-2.5 mt-4">
-        <span className="text-[11px] font-mono text-steam-dim whitespace-nowrap">
-          {project.done}/{project.total} tareas
+        <span className="font-mono text-[9.5px] text-steam-dim whitespace-nowrap">
+          {String(project.done).padStart(2, "0")}/{String(project.total).padStart(2, "0")}
         </span>
         <div className="flex-1">
           <ProgressBar
             value={pct}
-            className={pct === 100 ? "bg-steam-green" : "bg-gradient-to-r from-[#4c8fb0] to-steam-link"}
+            className={
+              pct === 100
+                ? "bg-cyber-lime text-cyber-lime bar-glow"
+                : "bg-cyber-cyan text-cyber-cyan bar-glow"
+            }
+            trackClassName="rounded-none bg-cyber-void/70 border border-cyber-cyan/15"
           />
         </div>
-        <span className="text-[11px] font-mono text-steam-dim w-16 text-right">
-          {pct === 100 ? "Completo" : `${pct}%`}
+        <span className="font-mono text-[9.5px] text-steam-dim w-14 text-right">
+          {pct === 100 ? "COMPLETO" : `${String(pct).padStart(3, "0")}%`}
         </span>
       </div>
     </article>
@@ -130,19 +149,31 @@ function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean
 }
 
 /** Tarjeta compacta, plegable, para el resto de los proyectos. */
-function CompactCard({ project }: { project: Project }) {
+function CompactCard({ project, index }: { project: Project; index: number }) {
   const [open, setOpen] = useState(false);
   const hasDetail = Boolean(project.longDescription || project.screenshotAssetIds.length);
+  const accent = accentFor(index + 1);
 
   return (
-    <article className="border border-steam-line/60 bg-steam-panel2/40 p-3.5 transition-colors hover:border-steam-link/50">
+    <article
+      className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 p-3.5 transition-all duration-200 hover:-translate-y-0.5`}
+    >
+      <span className="scan-sweep" />
+
       <div className="flex items-start gap-3">
-        <div className="w-11 h-11 shrink-0 flex items-center justify-center bg-steam-panel2 border border-steam-line text-xl">
+        <div className="w-10 h-10 shrink-0 flex items-center justify-center border border-current/30 bg-cyber-void text-lg">
           {project.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-steam-bright text-[14px] font-semibold mb-0.5">{project.title}</h3>
-          <p className="text-[12px] text-steam-dim mb-2">{project.description}</p>
+          <h3
+            data-text={project.title}
+            className="glitch font-display text-[13px] uppercase tracking-wide text-steam-bright leading-snug"
+          >
+            {project.title}
+          </h3>
+          <p className="font-mono text-[10px] text-steam-dim mt-1 mb-2 leading-relaxed">
+            {project.description}
+          </p>
           <TechChips tech={project.tech} />
         </div>
       </div>
@@ -159,17 +190,17 @@ function CompactCard({ project }: { project: Project }) {
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
-            className="px-2 py-1.5 text-[11.5px] text-steam-dim hover:text-steam-link transition-colors"
+            className="px-2 py-1.5 font-mono text-[10px] uppercase tracking-widest text-steam-dim hover:text-cyber-cyan transition-colors"
           >
-            {open ? "Menos" : "Más detalle"}
+            {open ? "[ − ] menos" : "[ + ] detalle"}
           </button>
         ) : null}
       </div>
 
       {open ? (
-        <div className="mt-3 pt-3 border-t border-steam-line/50">
+        <div className="mt-3 pt-3 border-t border-current/20">
           {project.longDescription ? (
-            <p className="text-[12.5px] leading-relaxed text-steam-text/85">
+            <p className="text-[12px] leading-relaxed text-steam-text/85">
               {project.longDescription}
             </p>
           ) : null}
@@ -180,10 +211,7 @@ function CompactCard({ project }: { project: Project }) {
   );
 }
 
-/**
- * Vitrina de demos: el equivalente al "Expositor de artículos" de Steam, pero
- * mostrando proyectos con su demo en vivo y su repositorio.
- */
+/** Vitrina de proyectos: destacado arriba, el resto en grilla. */
 export default function ProjectShowcase() {
   const { data } = usePortfolio();
   const { isOwner } = useAuth();
@@ -195,22 +223,22 @@ export default function ProjectShowcase() {
   return (
     <Panel
       id="proyectos"
-      title="Vitrina de proyectos"
-      aside={<span className="font-mono text-steam-dim">{projects.length} publicados</span>}
+      title="Vitrina"
+      aside={<span className="text-cyber-cyan">{String(projects.length).padStart(2, "0")}</span>}
     >
       {projects.length === 0 ? (
-        <p className="text-xs text-steam-dim">
+        <p className="font-mono text-[10.5px] text-steam-dim">
           {isOwner
-            ? "Todavía no hay proyectos. Agregalos desde Modificar perfil → Proyectos."
-            : "Todavía no hay proyectos publicados."}
+            ? "Sin proyectos. Cargalos en Modificar perfil → Proyectos."
+            : "Sin proyectos publicados todavía."}
         </p>
       ) : (
         <>
           {featured ? <FeaturedCard project={featured} isOwner={isOwner} /> : null}
           {rest.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {rest.map((p) => (
-                <CompactCard key={p.id} project={p} />
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
+              {rest.map((p, i) => (
+                <CompactCard key={p.id} project={p} index={i} />
               ))}
             </div>
           ) : null}

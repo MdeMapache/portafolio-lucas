@@ -2,11 +2,9 @@
 
 import { usePortfolio } from "@/components/PortfolioProvider";
 import Panel from "@/components/ui/Panel";
+import { accentFor } from "@/components/ui/accents";
 
-/**
- * Certificaciones formales — el equivalente a las Insignias de un perfil de
- * Steam: credenciales obtenidas, con quién las emitió y cuándo.
- */
+/** Certificaciones formales, con el mismo lenguaje de tarjeta del dossier. */
 export default function Certifications() {
   const { data } = usePortfolio();
   const { certifications } = data;
@@ -16,25 +14,33 @@ export default function Certifications() {
   return (
     <Panel
       title="Certificaciones"
-      aside={<span className="text-steam-link font-mono">{certifications.length}</span>}
+      aside={<span className="text-cyber-cyan">{String(certifications.length).padStart(2, "0")}</span>}
+      bodyClassName="grid grid-cols-1 gap-2"
     >
-      {certifications.map((cert) => (
-        <div
-          key={cert.id}
-          className="flex gap-2.5 items-start py-2 border-b border-white/5 last:border-b-0"
-        >
-          <div className="w-[26px] h-[26px] shrink-0 mt-0.5 flex items-center justify-center border border-steam-gold/60 bg-steam-gold/10 text-[11px] text-steam-gold">
-            ★
-          </div>
-          <div className="min-w-0">
-            <div className="text-[12.5px] text-steam-bright leading-snug">{cert.name}</div>
-            <div className="text-[10.5px] text-steam-dim">
+      {certifications.map((cert, i) => {
+        const accent = accentFor(i);
+        return (
+          <article
+            key={cert.id}
+            className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`}
+          >
+            <span className="scan-sweep" />
+            <div className="flex items-baseline gap-2">
+              <span className="font-mono text-[9.5px] shrink-0">[CRT]</span>
+              <h3
+                data-text={cert.name}
+                className="glitch font-display text-[13px] uppercase tracking-wide text-steam-bright leading-snug"
+              >
+                {cert.name}
+              </h3>
+            </div>
+            <p className="font-mono text-[9.5px] text-steam-dim mt-1 ml-[30px]">
               {cert.issuer}
               {cert.year ? ` · ${cert.year}` : ""}
-            </div>
-          </div>
-        </div>
-      ))}
+            </p>
+          </article>
+        );
+      })}
     </Panel>
   );
 }

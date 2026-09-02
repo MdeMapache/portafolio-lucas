@@ -1,13 +1,16 @@
 /**
- * Contenedor con la cabecera de sección típica de Steam: título a la izquierda,
- * dato o acción a la derecha, y el cuerpo del panel abajo.
+ * Cabecera de sección interna, al estilo del dossier del perfil.
+ *
+ * Deliberadamente liviana: estos paneles ya viven dentro del panel holográfico
+ * del SectionRouter, así que repetir marco, fondo y borde generaría una caja
+ * dentro de otra caja. Acá alcanza con el rótulo `// título` y el contenido.
  */
 export default function Panel({
   title,
   aside,
   id,
   className = "",
-  bodyClassName = "p-5",
+  bodyClassName = "",
   children,
 }: {
   title: string;
@@ -19,13 +22,18 @@ export default function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section
-      id={id}
-      className={`bg-steam-panel border border-white/5 mb-5 transition-colors hover:border-white/10 ${className}`}
-    >
-      <header className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-steam-line to-steam-bgTop">
-        <h2 className="text-steam-bright text-sm tracking-wide">{title}</h2>
-        {aside ? <div className="flex items-center gap-3 text-xs">{aside}</div> : null}
+    <section id={id} className={`mb-7 ${className}`}>
+      <header className="flex items-baseline gap-2 mb-3 pb-1.5 border-b border-cyber-cyan/15">
+        <span className="font-mono text-[10px] text-cyber-cyan/50">{"//"}</span>
+        <h2
+          data-text={title}
+          className="glitch font-mono text-[10px] uppercase tracking-[0.25em] text-cyber-cyan/80"
+        >
+          {title}
+        </h2>
+        {aside ? (
+          <div className="ml-auto flex items-center gap-3 font-mono text-[10px]">{aside}</div>
+        ) : null}
       </header>
       <div className={bodyClassName}>{children}</div>
     </section>

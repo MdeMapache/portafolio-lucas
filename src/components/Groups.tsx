@@ -2,8 +2,9 @@
 
 import { usePortfolio } from "@/components/PortfolioProvider";
 import Panel from "@/components/ui/Panel";
+import { accentFor } from "@/components/ui/accents";
 
-/** Comunidades y formación — el equivalente a los Grupos de Steam. */
+/** Formación y comunidades. */
 export default function Groups() {
   const { data } = usePortfolio();
   const { groups } = data;
@@ -12,24 +13,34 @@ export default function Groups() {
 
   return (
     <Panel
-      title="Comunidades"
-      aside={<span className="text-steam-link font-mono">{groups.length}</span>}
+      title="Redes y formación"
+      aside={<span className="text-cyber-cyan">{String(groups.length).padStart(2, "0")}</span>}
+      bodyClassName="grid grid-cols-1 gap-2"
     >
-      {groups.map((group) => {
+      {groups.map((group, i) => {
+        // Desfasamos el ciclo de color para que no quede igual que la columna
+        // de al lado cuando ambas se ven en paralelo.
+        const accent = accentFor(i + 2);
+
         const body = (
           <>
-            <div className="w-[34px] h-[34px] shrink-0 flex items-center justify-center bg-steam-panel2 border border-steam-line text-[15px]">
-              {group.icon}
-            </div>
-            <div className="min-w-0">
-              <div className="text-[12.5px] text-steam-bright truncate">{group.name}</div>
-              <div className="text-[10.5px] text-steam-dim truncate">{group.sub}</div>
+            <span className="scan-sweep" />
+            <div className="flex items-center gap-3">
+              <span className="text-base shrink-0">{group.icon}</span>
+              <div className="min-w-0">
+                <div
+                  data-text={group.name}
+                  className="glitch font-display text-[13px] uppercase tracking-wide text-steam-bright truncate"
+                >
+                  {group.name}
+                </div>
+                <div className="font-mono text-[9.5px] text-steam-dim truncate">{group.sub}</div>
+              </div>
             </div>
           </>
         );
 
-        const rowClass =
-          "flex gap-2.5 items-center py-2 border-b border-white/5 last:border-b-0 transition-colors";
+        const shell = `group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`;
 
         return group.url ? (
           <a
@@ -37,12 +48,12 @@ export default function Groups() {
             href={group.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${rowClass} hover:bg-steam-panel2/50 -mx-2 px-2`}
+            className={`${shell} block`}
           >
             {body}
           </a>
         ) : (
-          <div key={group.id} className={rowClass}>
+          <div key={group.id} className={shell}>
             {body}
           </div>
         );

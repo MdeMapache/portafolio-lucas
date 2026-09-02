@@ -210,3 +210,121 @@ body {
     opacity: 0;
   }
 }
+
+/* ── Efectos de tarjeta ───────────────────────────────────────────────────
+   Las clases de acá se combinan sobre las tarjetas de las secciones. Ojo con
+   los pseudo-elementos: `corner-frame` ya usa ::before y ::after, por eso el
+   barrido de escaneo va como elemento hijo real y no como otro pseudo.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Escuadras en dos esquinas opuestas, marca de la casa ciberpunk. */
+.corner-frame {
+  position: relative;
+}
+
+.corner-frame::before,
+.corner-frame::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-color: currentColor;
+  opacity: 0.85;
+  transition: width 0.2s ease, height 0.2s ease;
+  pointer-events: none;
+}
+
+.corner-frame::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+.corner-frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+}
+
+/* Al pasar el cursor las escuadras se estiran, como un visor enfocando. */
+.corner-frame:hover::before,
+.corner-frame:hover::after,
+.group:hover .corner-frame::before,
+.group:hover .corner-frame::after {
+  width: 18px;
+  height: 18px;
+}
+
+/* Barrido de escaneo: un haz que cruza la tarjeta al pasar el cursor. */
+.scan-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scan-sweep::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(0, 240, 255, 0.14) 50%,
+    transparent 80%
+  );
+  transform: translateX(-110%);
+}
+
+.group:hover .scan-sweep::before {
+  animation: scan-across 0.75s ease-out;
+}
+
+@keyframes scan-across {
+  to { transform: translateX(110%); }
+}
+
+/* Pulso para indicadores de estado. */
+.neon-pulse {
+  animation: neon-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes neon-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px currentColor; }
+  50%      { opacity: 0.55; box-shadow: 0 0 14px currentColor; }
+}
+
+/* Brillo sobre la barra llena, para que el progreso "emita". */
+.bar-glow {
+  box-shadow: 0 0 8px currentColor, 0 0 2px currentColor;
+}
+
+/* Números grandes con temblor de tubo, para las estadísticas. */
+.data-flicker {
+  animation: data-flicker 6s steps(1, end) infinite;
+}
+
+@keyframes data-flicker {
+  0%, 96%, 100% { opacity: 1; }
+  97%           { opacity: 0.72; }
+  98%           { opacity: 1; }
+  99%           { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-pulse,
+  .data-flicker,
+  .group:hover .scan-sweep::before {
+    animation: none;
+  }
+
+  .corner-frame:hover::before,
+  .corner-frame:hover::after,
+  .group:hover .corner-frame::before,
+  .group:hover .corner-frame::after {
+    width: 9px;
+    height: 9px;
+  }
+}

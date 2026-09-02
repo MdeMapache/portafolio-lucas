@@ -2,8 +2,9 @@
 
 import { usePortfolio } from "@/components/PortfolioProvider";
 import Panel from "@/components/ui/Panel";
+import { accentFor } from "@/components/ui/accents";
 
-/** Redes sociales y contacto, con el punto de estado al estilo de Steam. */
+/** Canales de contacto, con el código del canal como etiqueta técnica. */
 export default function Contact() {
   const { data } = usePortfolio();
   const { contacts, profile } = data;
@@ -11,39 +12,45 @@ export default function Contact() {
   return (
     <Panel
       id="contacto"
-      title="Contacto"
+      title="Canales"
       aside={
-        <span className={profile.availableForWork ? "text-steam-green" : "text-steam-dim"}>
-          {profile.availableForWork ? "online" : "ausente"}
+        <span
+          className={
+            profile.availableForWork ? "text-cyber-lime neon-pulse" : "text-steam-dim"
+          }
+        >
+          {profile.availableForWork ? "ONLINE" : "AUSENTE"}
         </span>
       }
+      bodyClassName="grid grid-cols-1 gap-2"
     >
-      {contacts.map((contact) => {
+      {contacts.map((contact, i) => {
+        const accent = accentFor(i);
+
         const body = (
           <>
-            <div className="relative w-8 h-8 shrink-0 flex items-center justify-center bg-steam-panel2 border border-steam-line text-sm font-mono">
-              {contact.code}
+            <span className="scan-sweep" />
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-[10px] shrink-0 w-9">[{contact.code}]</span>
+              <div className="min-w-0 flex-1">
+                <div
+                  data-text={contact.name}
+                  className="glitch font-mono text-[11.5px] text-steam-bright break-all leading-snug"
+                >
+                  {contact.name}
+                </div>
+                <div className="font-mono text-[9.5px] text-steam-dim mt-0.5">{contact.role}</div>
+              </div>
               <span
-                className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-steam-panel ${
-                  contact.online ? "bg-steam-green" : "bg-steam-line"
+                className={`shrink-0 w-1.5 h-1.5 rounded-full ${
+                  contact.online ? "bg-cyber-lime neon-pulse" : "bg-steam-dim"
                 }`}
               />
-            </div>
-            <div className="min-w-0">
-              <div
-                className={`text-[12.5px] break-all ${
-                  contact.url ? "text-steam-link group-hover:text-steam-linkHover" : "text-steam-text"
-                }`}
-              >
-                {contact.name}
-              </div>
-              <div className="text-[10.5px] text-steam-dim">{contact.role}</div>
             </div>
           </>
         );
 
-        const rowClass =
-          "group flex items-center gap-2.5 py-2.5 border-b border-white/5 last:border-b-0 transition-colors";
+        const shell = `group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`;
 
         return contact.url ? (
           <a
@@ -51,12 +58,12 @@ export default function Contact() {
             href={contact.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${rowClass} hover:bg-steam-panel2/50 -mx-2 px-2`}
+            className={`${shell} block`}
           >
             {body}
           </a>
         ) : (
-          <div key={contact.id} className={rowClass}>
+          <div key={contact.id} className={shell}>
             {body}
           </div>
         );
