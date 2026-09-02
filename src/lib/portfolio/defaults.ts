@@ -149,10 +149,44 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
     },
   ],
 
+  // Certificaciones del currículum de Ingeniería en Informática, Duoc UC.
+  // El certificado que las acredita lleva C.I. e ID de validación: no van acá,
+  // son datos personales que no corresponden en un sitio público.
+  certifications: [
+    { id: "cert-arq", name: "Arquitectura de Software", issuer: "Duoc UC", year: "2026" },
+    { id: "cert-prog", name: "Programación de Software", issuer: "Duoc UC", year: "2026" },
+    {
+      id: "cert-datos",
+      name: "Análisis y Desarrollo de Modelos de Datos",
+      issuer: "Duoc UC",
+      year: "2026",
+    },
+    { id: "cert-calidad", name: "Calidad de Software", issuer: "Duoc UC", year: "2026" },
+    { id: "cert-bi", name: "Inteligencia de Negocios", issuer: "Duoc UC", year: "2026" },
+    {
+      id: "cert-proyectos",
+      name: "Gestión de Proyectos Informáticos",
+      issuer: "Duoc UC",
+      year: "2026",
+    },
+    {
+      id: "cert-requerimientos",
+      name: "Análisis y Planificación de Requerimientos Informáticos",
+      issuer: "Duoc UC",
+      year: "2026",
+    },
+    {
+      id: "cert-internacional",
+      name: "Certificado Internacional — Nivel Intermedio",
+      issuer: "Duoc UC",
+      year: "2026",
+    },
+  ],
+
   stats: [
     { id: "st-proyectos", num: 3, label: "Proyectos" },
     { id: "st-produccion", num: 1, label: "En producción" },
-    { id: "st-cert", num: 1, label: "Certificaciones" },
+    { id: "st-cert", num: 8, label: "Certificaciones" },
     { id: "st-progreso", num: 2, label: "En progreso" },
   ],
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePortfolio } from "@/components/PortfolioProvider";
-import type { Contact, Group, Stat } from "@/lib/portfolio/types";
+import type { Certification, Contact, Group, Stat } from "@/lib/portfolio/types";
 import { Button, EditRow, Field, TextInput } from "./fields";
 
 function newId(prefix: string) {
@@ -15,7 +15,7 @@ function newId(prefix: string) {
  */
 export default function LinksTab() {
   const { data, update } = usePortfolio();
-  const { contacts, groups, stats } = data;
+  const { contacts, groups, stats, certifications } = data;
 
   function patchContact(id: string, patch: Partial<Contact>) {
     update({ contacts: contacts.map((c) => (c.id === id ? { ...c, ...patch } : c)) });
@@ -27,6 +27,12 @@ export default function LinksTab() {
 
   function patchStat(id: string, patch: Partial<Stat>) {
     update({ stats: stats.map((s) => (s.id === id ? { ...s, ...patch } : s)) });
+  }
+
+  function patchCert(id: string, patch: Partial<Certification>) {
+    update({
+      certifications: certifications.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    });
   }
 
   return (
@@ -146,6 +152,55 @@ export default function LinksTab() {
             }
           >
             + Agregar comunidad
+          </Button>
+        </div>
+      </Field>
+
+      <Field label="Certificaciones" hint="No pongas acá números de documento ni IDs de validación.">
+        <div>
+          {certifications.map((cert) => (
+            <EditRow
+              key={cert.id}
+              onRemove={() =>
+                update({ certifications: certifications.filter((c) => c.id !== cert.id) })
+              }
+            >
+              <TextInput
+                value={cert.name}
+                onChange={(e) => patchCert(cert.id, { name: e.target.value })}
+                placeholder="Nombre de la certificación"
+                className="mb-2"
+                aria-label="Nombre"
+              />
+              <div className="flex gap-2">
+                <TextInput
+                  value={cert.issuer}
+                  onChange={(e) => patchCert(cert.id, { issuer: e.target.value })}
+                  placeholder="Emisor"
+                  aria-label="Emisor"
+                />
+                <TextInput
+                  value={cert.year}
+                  onChange={(e) => patchCert(cert.id, { year: e.target.value })}
+                  placeholder="Año"
+                  className="w-24 text-center font-mono"
+                  aria-label="Año"
+                />
+              </div>
+            </EditRow>
+          ))}
+          <Button
+            type="button"
+            onClick={() =>
+              update({
+                certifications: [
+                  ...certifications,
+                  { id: newId("cert"), name: "", issuer: "", year: "" },
+                ],
+              })
+            }
+          >
+            + Agregar certificación
           </Button>
         </div>
       </Field>

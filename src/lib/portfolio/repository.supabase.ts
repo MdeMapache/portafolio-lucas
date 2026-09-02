@@ -77,6 +77,7 @@ function migrate(saved: Partial<PortfolioData>): PortfolioData {
     techBadges: saved.techBadges ?? defaults.techBadges,
     groups: saved.groups ?? defaults.groups,
     contacts: saved.contacts ?? defaults.contacts,
+    certifications: saved.certifications ?? defaults.certifications,
     stats: saved.stats ?? defaults.stats,
   };
 }

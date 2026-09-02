@@ -67,6 +67,14 @@ export type Contact = {
 };
 export type Stat = { id: string; num: number; label: string };
 
+/** Certificación formal. El emisor y el año se muestran como subtítulo. */
+export type Certification = {
+  id: string;
+  name: string;
+  issuer: string;
+  year: string;
+};
+
 export type PortfolioData = {
   /** Se incrementa cuando cambia la forma del documento, para migraciones. */
   version: number;
@@ -78,6 +86,7 @@ export type PortfolioData = {
   techBadges: TechBadge[];
   groups: Group[];
   contacts: Contact[];
+  certifications: Certification[];
   stats: Stat[];
 };
 

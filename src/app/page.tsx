@@ -1,4 +1,5 @@
 import ActivityFeed from "@/components/ActivityFeed";
+import Certifications from "@/components/Certifications";
 import Contact from "@/components/Contact";
 import Groups from "@/components/Groups";
 import Hero from "@/components/Hero";
@@ -27,6 +28,7 @@ export default function Home() {
 
           <aside className="min-w-0">
             <TechStack />
+            <Certifications />
             <Groups />
             <Contact />
           </aside>
