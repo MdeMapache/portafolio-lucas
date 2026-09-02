@@ -7,10 +7,12 @@ import LinksTab from "./LinksTab";
 import ProfileTab from "./ProfileTab";
 import ProjectsTab from "./ProjectsTab";
 import SkillsTab from "./SkillsTab";
+import TrayectoriaTab from "./TrayectoriaTab";
 
 const TABS = [
   { id: "perfil", label: "Perfil", Component: ProfileTab },
   { id: "fondo", label: "Fondo", Component: BackgroundTab },
+  { id: "trayectoria", label: "Trayectoria", Component: TrayectoriaTab },
   { id: "stack", label: "Stack", Component: SkillsTab },
   { id: "proyectos", label: "Proyectos", Component: ProjectsTab },
   { id: "enlaces", label: "Enlaces", Component: LinksTab },

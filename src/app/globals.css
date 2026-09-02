@@ -118,6 +118,111 @@ body {
     inset 0 0 40px rgba(0, 240, 255, 0.04);
 }
 
+/* ── Proyector holográfico ────────────────────────────────────────────────
+   Se usa para proyectar el CV. El PDF viene con fondo blanco y tinta negra,
+   así que el truco es dar vuelta la imagen y teñirla: `invert` deja la hoja en
+   negro y la tinta en blanco, `sepia` la lleva a un tono plano que `hue-rotate`
+   puede empujar entero al cian. Sin el paso de sepia, hue-rotate no tiene sobre
+   qué actuar porque el gris no tiene matiz.
+
+   Va sobre el <iframe> completo: los filtros CSS se aplican al resultado
+   compuesto, así que funciona igual con el visor de PDF del navegador dentro.
+   ──────────────────────────────────────────────────────────────────────── */
+.holo-tint {
+  filter: invert(1) sepia(1) hue-rotate(150deg) saturate(5) brightness(1.05) contrast(1.15);
+}
+
+/* Cono de luz que sale del emisor de abajo. El clip-path lo hace trapecio:
+   angosto en la base, ancho arriba, como un proyector real. */
+.holo-beam {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 240, 255, 0.22) 0%,
+    rgba(0, 240, 255, 0.07) 45%,
+    transparent 85%
+  );
+  clip-path: polygon(42% 100%, 58% 100%, 100% 0%, 0% 0%);
+  animation: holo-beam 5s ease-in-out infinite;
+}
+
+@keyframes holo-beam {
+  0%, 100% { opacity: 0.75; }
+  50%      { opacity: 1; }
+}
+
+/* Líneas de barrido propias de la proyección: más finas que las del CRT
+   global, porque acá van sobre texto que tiene que seguir siendo legible. */
+.holo-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 240, 255, 0.11) 0px,
+    rgba(0, 240, 255, 0.11) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* Banda de refresco que recorre el documento de arriba a abajo. */
+.holo-band::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22%;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 240, 255, 0.16) 45%,
+    rgba(255, 46, 151, 0.08) 55%,
+    transparent 100%
+  );
+  animation: holo-band 4.5s linear infinite;
+}
+
+@keyframes holo-band {
+  from { transform: translateY(-120%); }
+  to   { transform: translateY(560%); }
+}
+
+/* Inestabilidad constante de la proyección. Muy leve a propósito: el efecto
+   tiene que sentirse vivo sin marear a quien está tratando de leer. */
+.holo-jitter {
+  animation: holo-jitter 3.4s steps(1, end) infinite;
+}
+
+@keyframes holo-jitter {
+  0%, 88%, 100% { opacity: 1; transform: translateX(0); }
+  90%           { opacity: 0.86; transform: translateX(-0.5px); }
+  94%           { opacity: 1; transform: translateX(0.5px); }
+  96%           { opacity: 0.93; transform: translateX(0); }
+}
+
+/* Emisor: la barra encendida de la que "sale" la proyección. */
+.holo-emitter {
+  background: linear-gradient(90deg, transparent, #00f0ff 25%, #7df9ff 50%, #00f0ff 75%, transparent);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.75), 0 0 34px rgba(0, 240, 255, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holo-beam,
+  .holo-band::after,
+  .holo-jitter {
+    animation: none;
+  }
+
+  /* Sin animación la banda queda congelada a media pantalla tapando texto. */
+  .holo-band::after {
+    display: none;
+  }
+}
+
 /* ── Fondos de perfil ─────────────────────────────────────────────────────
    El catálogo vive en lib/portfolio/backgrounds.ts y los ids de allá tienen
    que coincidir con estas clases.

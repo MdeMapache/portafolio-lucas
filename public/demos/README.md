@@ -22,6 +22,27 @@ sección muestra cualquier proyecto que tenga `demoUrl`.
 
 ---
 
+## Demos autocontenidos (HTML/JS)
+
+`tavern-quest/` es de este tipo: un solo `index.html` con el CSS y el JS
+adentro, más las imágenes en su `img/`. Pesa unos 130 KB en total, así que no
+hace falta pensar en el peso del repo como con un export de Godot.
+
+Dos restricciones que impone el entorno, y que no son obvias hasta que algo
+falla en silencio:
+
+- **COEP `require-corp`.** `next.config.ts` aísla `/demos/`, así que el
+  documento **no puede cargar nada de otro origen**: ni CDNs, ni Google Fonts,
+  ni imágenes remotas. Todo va inline o en la propia carpeta. No hay error
+  visible: el recurso simplemente no llega.
+- **El `sandbox` del iframe no incluye `allow-modals`.** `alert()`, `confirm()`
+  y `prompt()` no hacen nada. Hay que usar diálogos propios en el DOM.
+
+También conviene que funcione a **320 px de alto**, que es como arranca el
+iframe antes de que alguien apriete `[ + ]`.
+
+---
+
 ## Exportar desde Godot 4
 
 ### La decisión que importa: hilos sí o no

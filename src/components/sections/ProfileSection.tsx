@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import CvHologram from "@/components/CvHologram";
 import { usePortfolio, useAssetUrl } from "@/components/PortfolioProvider";
 
 /**
@@ -8,9 +8,9 @@ import { usePortfolio, useAssetUrl } from "@/components/PortfolioProvider";
  *
  * El texto usa la narrativa ciberpunk pero NO inventa credenciales: todo lo que
  * afirma sale del CV real (Ingeniería Informática en Duoc UC, diplomado en
- * ciberseguridad en curso, certificación en modelado de datos, Godot, Angular /
- * Ionic). Un portafolio se usa para postular, y una skill inflada se cae en la
- * primera entrevista técnica.
+ * ciberseguridad terminado, certificación en modelado de datos, Godot, Angular
+ * / Ionic). Un portafolio se usa para postular, y una skill inflada se cae en
+ * la primera entrevista técnica.
  */
 
 const DOSSIER = [
@@ -19,7 +19,7 @@ const DOSSIER = [
     title: "Ciberseguridad",
     accent: "text-cyber-magenta",
     border: "border-cyber-magenta/40",
-    body: "Diplomado en Ciberseguridad en Duoc UC, cursando desde octubre de 2025. La formación se traduce en cómo escribo: validación del lado del servidor antes que del cliente, credenciales fuera del bundle, y permisos que se imponen en la base y no escondiendo botones en la interfaz.",
+    body: "Diplomado en Ciberseguridad en Duoc UC, cursado entre 2025 y 2026. La formación se traduce en cómo escribo: validación del lado del servidor antes que del cliente, credenciales fuera del bundle, y permisos que se imponen en la base y no escondiendo botones en la interfaz.",
   },
   {
     code: "DAT",
@@ -48,17 +48,6 @@ export default function ProfileSection() {
   const { data } = usePortfolio();
   const { profile } = data;
   const cvUrl = useAssetUrl(data.cvAssetId);
-
-  const [cvOpen, setCvOpen] = useState(false);
-
-  useEffect(() => {
-    if (!cvOpen) return;
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") setCvOpen(false);
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cvOpen]);
 
   return (
     <div>
@@ -103,60 +92,10 @@ export default function ProfileSection() {
         ))}
       </div>
 
-      {/* CV -------------------------------------------------------------- */}
-      {cvUrl ? (
-        <button
-          type="button"
-          onClick={() => setCvOpen(true)}
-          className="px-5 py-2 font-display text-[12px] uppercase tracking-widest border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan/10 hover:shadow-neon-cyan transition-all"
-        >
-          Abrir CV completo
-        </button>
-      ) : (
-        <p className="font-mono text-[10.5px] text-steam-dim/60">
-          CV no publicado todavía.
-        </p>
-      )}
-
-      {cvOpen && cvUrl ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 sm:p-8"
-          onClick={() => setCvOpen(false)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Curriculum Vitae"
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-3xl h-[85vh] bg-cyber-void border border-cyber-cyan/40 holo-edge"
-          >
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-cyber-cyan/25">
-              <span className="font-display text-[13px] uppercase tracking-widest text-cyber-cyan">
-                Curriculum Vitae
-              </span>
-              <div className="flex items-center gap-3">
-                <a
-                  href={cvUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-mono text-[10px] text-steam-dim hover:text-cyber-cyan transition-colors"
-                >
-                  PESTAÑA NUEVA ↗
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setCvOpen(false)}
-                  aria-label="Cerrar"
-                  className="text-steam-dim hover:text-cyber-magenta text-lg leading-none transition-colors"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-            <iframe src={cvUrl} title="Curriculum Vitae" className="w-full h-[calc(100%-42px)]" />
-          </div>
-        </div>
-      ) : null}
+      {/* CV ---------------------------------------------------------------
+          El PDF no se ofrece como un enlace suelto sino proyectado: ver
+          CvHologram. Si no hay ninguno cargado, el proyector se muestra vacío. */}
+      <CvHologram url={cvUrl} />
     </div>
   );
 }

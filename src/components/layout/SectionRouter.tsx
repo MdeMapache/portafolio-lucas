@@ -7,6 +7,7 @@ import DemosSection from "@/components/sections/DemosSection";
 import ProfileSection from "@/components/sections/ProfileSection";
 import ProjectsSection from "@/components/sections/ProjectsSection";
 import SkillsSection from "@/components/sections/SkillsSection";
+import TrayectoriaSection from "@/components/sections/TrayectoriaSection";
 import Sidebar from "./Sidebar";
 import { DEFAULT_SECTION, SECTIONS, isSectionId, type SectionId } from "./sections";
 
@@ -14,6 +15,7 @@ const PANELS: Record<SectionId, React.ComponentType> = {
   perfil: ProfileSection,
   proyectos: ProjectsSection,
   demos: DemosSection,
+  trayectoria: TrayectoriaSection,
   habilidades: SkillsSection,
   contacto: ContactSection,
 };

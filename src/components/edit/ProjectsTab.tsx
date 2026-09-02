@@ -152,10 +152,18 @@ export default function ProjectsTab() {
                   />
                 </Field>
 
-                <Field label="Demo en vivo" hint="URL completa, o vacío si todavía no hay demo.">
+                {/*
+                  No es `type="url"`: un demo autohospedado en `public/demos/`
+                  se carga con una ruta relativa, que `type="url"` marca como
+                  inválida. Ver public/demos/README.md.
+                */}
+                <Field
+                  label="Demo en vivo"
+                  hint="URL completa, o una ruta propia como /demos/runner-2d/index.html."
+                >
                   <TextInput
-                    type="url"
-                    placeholder="https://mi-demo.vercel.app"
+                    type="text"
+                    placeholder="/demos/runner-2d/index.html"
                     value={project.demoUrl ?? ""}
                     onChange={(e) =>
                       patchProject(project.id, { demoUrl: e.target.value.trim() || null })

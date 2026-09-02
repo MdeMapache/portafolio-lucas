@@ -9,8 +9,9 @@ export const SECTIONS = [
   { id: "perfil", label: "Perfil", code: "01", hint: "Identidad y stack" },
   { id: "proyectos", label: "Proyectos", code: "02", hint: "Repositorios y avance" },
   { id: "demos", label: "Demos", code: "03", hint: "Apps en vivo" },
-  { id: "habilidades", label: "Habilidades", code: "04", hint: "Dominio y certificaciones" },
-  { id: "contacto", label: "Contacto", code: "05", hint: "Canales abiertos" },
+  { id: "trayectoria", label: "Trayectoria", code: "04", hint: "Experiencia y formación" },
+  { id: "habilidades", label: "Habilidades", code: "05", hint: "Dominio y certificaciones" },
+  { id: "contacto", label: "Contacto", code: "06", hint: "Canales abiertos" },
 ] as const;
 
 export type SectionId = (typeof SECTIONS)[number]["id"];

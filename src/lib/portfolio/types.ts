@@ -54,6 +54,42 @@ export type Project = {
   featured: boolean;
 };
 
+/**
+ * Un puesto de trabajo.
+ *
+ * `end: null` significa "sigue vigente" y la interfaz lo pinta como
+ * *Actualmente*. Guardar el null en vez del texto permite ordenar y destacar
+ * los puestos activos sin tener que adivinar leyendo una cadena.
+ *
+ * Las tareas van en `highlights` y no en un párrafo: en el CV son viñetas, y
+ * apelmazarlas en prosa hace que no las lea nadie.
+ */
+export type Experience = {
+  id: string;
+  role: string;
+  company: string;
+  location: string;
+  /** Texto libre tal como se muestra, ej. "May. 2025". */
+  start: string;
+  end: string | null;
+  /** Una línea que resume el puesto. Puede ir vacía. */
+  summary: string;
+  highlights: string[];
+};
+
+/** Formación formal. Misma convención que `Experience` para `end`. */
+export type Education = {
+  id: string;
+  title: string;
+  institution: string;
+  location: string;
+  start: string;
+  end: string | null;
+};
+
+/** `level` es texto libre ("Intermedio", "B2"); vacío = sin declarar. */
+export type Language = { id: string; name: string; level: string };
+
 export type Skill = { id: string; name: string; level: number };
 export type TechBadge = { id: string; label: string; level: number };
 export type Group = { id: string; icon: string; name: string; sub: string; url: string | null };
@@ -82,6 +118,9 @@ export type PortfolioData = {
   background: BackgroundChoice;
   cvAssetId: AssetId | null;
   projects: Project[];
+  experience: Experience[];
+  education: Education[];
+  languages: Language[];
   skills: Skill[];
   techBadges: TechBadge[];
   groups: Group[];
@@ -90,5 +129,10 @@ export type PortfolioData = {
   stats: Stat[];
 };
 
-/** Versión actual del esquema. Subila al hacer cambios incompatibles. */
-export const SCHEMA_VERSION = 1;
+/**
+ * Versión actual del esquema. Subila al hacer cambios incompatibles.
+ *
+ * v2: se agregan `experience`, `education` e `languages`, que salen del CV.
+ * Los documentos v1 no las traen; `migrate()` las completa con los defaults.
+ */
+export const SCHEMA_VERSION = 2;

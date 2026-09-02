@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>TavernQuest — demo</title>
+<!--
+  TavernQuest — recreación web jugable.
+
+  El original es una app Flutter (Android) con Firebase. El proyecto se perdió y
+  sólo quedó el APK; los assets, los textos y las mecánicas de esta demo salen de
+  ahí. Esto es una reimplementación en HTML/CSS/JS sin dependencias: todo el
+  estado vive en memoria y se persiste en localStorage, no hay backend.
+
+  Se sirve embebido en un iframe con COEP require-corp, así que no puede cargar
+  nada de otro origen: cero CDNs, cero fuentes externas, todo inline.
+-->
+<style>
+  /* ── Paleta ────────────────────────────────────────────────────────────
+     Sacada del arte original: taberna a la luz de las velas. Ámbar cálido
+     sobre madera y piedra oscuras.
+     ──────────────────────────────────────────────────────────────────── */
+  :root {
+    --void:       #0c0806;
+    --wood-deep:  #1a1009;
+    --wood:       #2a1a10;
+    --wood-lit:   #3d2718;
+    --edge:       #5c3a20;
+    --edge-soft:  #402813;
+    --candle:     #ffb648;
+    --candle-dim: #c78535;
+    --gold:       #ffd479;
+    --parchment:  #e8d5b0;
+    --ink:        #a08a6a;
+    --ink-dim:    #7a6650;
+    --blood:      #c4442e;
+    --moss:       #8aa54a;
+    --violet:     #8a6bb5;
+
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --mono:  ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+
+    --r: 3px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    background: var(--void);
+    color: var(--parchment);
+    font-family: var(--serif);
+    font-size: 14px;
+    line-height: 1.45;
+    /* Evita que un doble toque haga zoom en móvil dentro del iframe. */
+    touch-action: manipulation;
+  }
+
+  /* La taberna de fondo, muy apagada: es ambiente, no protagonista. */
+  #backdrop {
+    position: fixed; inset: 0;
+    background: url("img/cantina.webp") center 34% / cover no-repeat;
+    opacity: .38;
+    /* El desenfoque no es estético: el arte original tiene un cartel con texto
+       legible que competía con la interfaz. Difuminado queda como ambiente. */
+    filter: saturate(.8) blur(3px);
+    transform: scale(1.04); /* tapa el borde claro que deja el blur */
+  }
+  #backdrop::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 12%, rgba(255,182,72,.16), transparent 70%),
+      linear-gradient(180deg, rgba(12,8,6,.62) 0%, rgba(12,8,6,.88) 50%, rgba(12,8,6,.96) 100%);
+  }
+
+  /* El titileo de las velas. Muy sutil: a más amplitud marea. */
+  @keyframes flicker {
+    0%, 100% { opacity: .38; }
+    43%      { opacity: .415; }
+    47%      { opacity: .365; }
+    62%      { opacity: .405; }
+  }
+  #backdrop { animation: flicker 5.5s ease-in-out infinite; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #backdrop { animation: none; }
+    * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+
+  /* ── Estructura ────────────────────────────────────────────────────────
+     Riel de iconos + escenario. El iframe del portafolio arranca en 320px de
+     alto, así que todo lo que crece va con scroll interno y nunca empuja.
+     ──────────────────────────────────────────────────────────────────── */
+  #app {
+    position: relative;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 52px 1fr;
+  }
+
+  .rail {
+    background: linear-gradient(180deg, rgba(26,16,9,.94), rgba(12,8,6,.94));
+    border-right: 1px solid var(--edge-soft);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 6px 0; gap: 2px;
+    z-index: 3;
+  }
+
+  .rail-logo {
+    width: 34px; height: 34px; margin-bottom: 6px; border-radius: 7px;
+    border: 1px solid var(--edge); flex: none;
+    background: url("img/logo.webp") center / cover;
+    box-shadow: 0 0 14px rgba(255,182,72,.22);
+  }
+
+  .rail button {
+    width: 40px; height: 36px; flex: none;
+    display: grid; place-items: center; gap: 1px;
+    background: none; border: 0; border-radius: var(--r);
+    color: var(--ink-dim); cursor: pointer;
+    font-size: 15px; line-height: 1;
+    transition: color .15s, background .15s;
+    position: relative;
+  }
+  .rail button:hover { color: var(--candle); background: rgba(255,182,72,.07); }
+  .rail button[aria-current="true"] { color: var(--gold); background: rgba(255,182,72,.12); }
+  .rail button[aria-current="true"]::before {
+    content: ""; position: absolute; left: -6px; top: 7px; bottom: 7px;
+    width: 2px; background: var(--gold); box-shadow: 0 0 7px var(--candle);
+  }
+  .rail .tip {
+    position: absolute; left: 46px; white-space: nowrap;
+    background: var(--wood); border: 1px solid var(--edge);
+    padding: 3px 7px; border-radius: var(--r);
+    font-family: var(--mono); font-size: 9px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--parchment);
+    opacity: 0; pointer-events: none; transition: opacity .13s; z-index: 9;
+  }
+  .rail button:hover .tip { opacity: 1; }
+
+  .stage { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+  /* ── Cabecera: nivel, fama, oro ───────────────────────────────────────── */
+  .topbar {
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--edge-soft);
+    background: linear-gradient(180deg, rgba(26,16,9,.88), rgba(26,16,9,.55));
+    flex: none;
+  }
+
+  .lvl {
+    display: grid; place-items: center; flex: none;
+    width: 32px; height: 32px;
+    border: 1px solid var(--gold); border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, rgba(255,182,72,.28), rgba(26,16,9,.9));
+    box-shadow: 0 0 11px rgba(255,182,72,.25);
+    font-family: var(--mono); font-weight: 700; font-size: 13px; color: var(--gold);
+  }
+
+  .fama { flex: 1; min-width: 0; }
+  .fama-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--mono); font-size: 8.5px; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--ink-dim); margin-bottom: 3px;
+  }
+  .bar {
+    height: 7px; border: 1px solid var(--edge);
+    background: rgba(0,0,0,.5); border-radius: 2px; overflow: hidden;
+  }
+  .bar > i {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--candle-dim), var(--gold));
+    box-shadow: 0 0 9px rgba(255,182,72,.5);
+    transition: width .5s cubic-bezier(.22,1,.36,1);
+  }
+
+  .purse {
+    display: flex; align-items: center; gap: 5px; flex: none;
+    padding: 4px 8px; border: 1px solid var(--edge-soft); border-radius: var(--r);
+    background: rgba(0,0,0,.35);
+  }
+  .purse b { font-family: var(--mono); font-size: 13px; color: var(--gold); font-weight: 700; }
+
+  /* Sprite de la moneda del APK: 96×16, 6 cuadros de 16×16. */
+  .coin {
+    width: 16px; height: 16px; flex: none;
+    background: url("img/coin-ss.png") 0 0 / 96px 16px;
+    image-rendering: pixelated;
+    animation: spin-coin .66s steps(6) infinite;
+  }
+  @keyframes spin-coin { to { background-position: -96px 0; } }
+
+  /* ── Pestañas ──────────────────────────────────────────────────────────── */
+  .tabs {
+    display: flex; gap: 0; flex: none;
+    border-bottom: 1px solid var(--edge-soft);
+    background: rgba(12,8,6,.55);
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button {
+    flex: none; padding: 6px 11px;
+    background: none; border: 0; border-bottom: 2px solid transparent;
+    color: var(--ink-dim); cursor: pointer;
+    font-family: var(--mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+    transition: color .15s, border-color .15s;
+  }
+  .tabs button:hover { color: var(--candle); }
+  .tabs button[aria-selected="true"] { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ── Lienzo con scroll ─────────────────────────────────────────────────── */
+  /* El padding inferior deja libre la franja donde flotan el sello y el FAB. */
+  .scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 9px 10px 34px; min-height: 0; }
+  /* En pantalla ancha el contenido no se estira: se centra como una app. */
+  .wrap { max-width: 940px; margin: 0 auto; }
+  .scroll::-webkit-scrollbar { width: 5px; }
+  .scroll::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 3px; }
+  .scroll::-webkit-scrollbar-track { background: transparent; }
+
+  h2.sect {
+    font-family: var(--mono); font-size: 8.5px; letter-spacing: .17em;
+    text-transform: uppercase; color: var(--ink-dim);
+    display: flex; align-items: center; gap: 7px; margin: 12px 0 6px;
+  }
+  h2.sect:first-child { margin-top: 0; }
+  h2.sect::after { content: ""; flex: 1; height: 1px; background: var(--edge-soft); }
+
+  /* ── Paneles de madera ─────────────────────────────────────────────────── */
+  .panel {
+    border: 1px solid var(--edge-soft); border-radius: var(--r);
+    background: linear-gradient(160deg, rgba(42,26,16,.82), rgba(20,12,7,.86));
+    padding: 9px 10px;
+  }
+
+  /* Angosto (el iframe sin expandir, o un móvil): una sola columna, el Jefe
+     arriba. Ancho: barra lateral fija con Jefe y fogata, contratos al lado. */
+  .mis-grid { display: grid; gap: 11px; align-items: start; }
+  @media (min-width: 660px) {
+    .mis-grid { grid-template-columns: 268px 1fr; }
+    .mis-grid > .col-side { position: sticky; top: 0; }
+  }
+
+  /* ── El Jefe ───────────────────────────────────────────────────────────── */
+  .boss { border-color: rgba(196,68,46,.4); position: relative; overflow: hidden; }
+  .boss::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(196,68,46,.16), transparent 62%);
+    pointer-events: none;
+  }
+  .boss-head { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+  .boss-head .name { font-size: 13px; font-weight: 700; color: #e8a091; letter-spacing: .02em; }
+  .boss-head .lv {
+    font-family: var(--mono); font-size: 8px; letter-spacing: .1em;
+    padding: 1px 5px; border: 1px solid rgba(196,68,46,.5); border-radius: 2px;
+    color: var(--blood); text-transform: uppercase;
+  }
+  .boss .bar > i { background: linear-gradient(90deg, #8c2d1c, var(--blood)); box-shadow: 0 0 9px rgba(196,68,46,.5); }
+  .boss-hp {
+    font-family: var(--mono); font-size: 8.5px; color: var(--ink-dim);
+    margin-top: 4px; display: flex; justify-content: space-between;
+  }
+  .boss-hint { font-size: 11px; color: var(--ink); margin-top: 6px; line-height: 1.4; }
+
+  @keyframes boss-hit {
+    0%   { transform: translateX(0); }
+    22%  { transform: translateX(-5px); }
+    45%  { transform: translateX(4px); }
+    70%  { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+  }
+  .boss.hit { animation: boss-hit .34s ease-out; border-color: var(--blood); }
+
+  /* ── Fogata ────────────────────────────────────────────────────────────── */
+  .fogata { display: flex; align-items: center; gap: 10px; }
+  .flame { font-size: 22px; flex: none; filter: drop-shadow(0 0 7px rgba(255,140,40,.6)); }
+  @keyframes dance { 0%,100% { transform: scale(1) rotate(-2deg); } 50% { transform: scale(1.11) rotate(2deg); } }
+  .flame.on { animation: dance 1.6s ease-in-out infinite; }
+  .flame.off { filter: grayscale(1) brightness(.45); }
+  .fogata .n { font-family: var(--mono); font-size: 17px; color: var(--candle); font-weight: 700; }
+  .fogata small { display: block; font-size: 10.5px; color: var(--ink-dim); line-height: 1.35; }
+
+  /* ── Contratos ─────────────────────────────────────────────────────────── */
+  .quest {
+    border: 1px solid var(--edge-soft); border-left: 2px solid var(--edge);
+    border-radius: var(--r); margin-bottom: 6px;
+    background: linear-gradient(100deg, rgba(42,26,16,.72), rgba(18,11,7,.8));
+    transition: border-color .18s, transform .18s, opacity .3s;
+  }
+  .quest:hover { border-left-color: var(--candle); }
+  .quest[data-cat="Gimnasio"]  { border-left-color: #b5563a; }
+  .quest[data-cat="Estudio"]   { border-left-color: var(--violet); }
+  .quest[data-cat="Trabajo"]   { border-left-color: #4a80a8; }
+  .quest[data-cat="Hogar"]     { border-left-color: var(--moss); }
+  .quest[data-cat="Mini Boss"] { border-left-color: var(--blood); }
+  .quest.vencida { opacity: .62; border-left-color: var(--blood) !important; }
+  .quest.hecha   { opacity: .45; }
+  .quest.hecha .q-title { text-decoration: line-through; color: var(--ink-dim); }
+
+  @keyframes q-out {
+    to { opacity: 0; transform: translateX(26px) scale(.97); max-height: 0; margin-bottom: 0; }
+  }
+  .quest.saliendo { animation: q-out .42s ease-in forwards; overflow: hidden; }
+
+  .q-main { display: flex; align-items: flex-start; gap: 8px; padding: 7px 9px; }
+
+  .q-check {
+    width: 17px; height: 17px; flex: none; margin-top: 1px;
+    border: 1px solid var(--edge); border-radius: 3px;
+    background: rgba(0,0,0,.35); cursor: pointer;
+    display: grid; place-items: center;
+    font-size: 11px; color: transparent;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .q-check:hover { border-color: var(--gold); background: rgba(255,182,72,.12); color: rgba(255,212,121,.35); }
+  .q-check[aria-checked="true"] { border-color: var(--moss); color: var(--moss); background: rgba(138,165,74,.14); }
+
+  .q-body { flex: 1; min-width: 0; }
+  .q-title { font-size: 13px; color: var(--parchment); line-height: 1.3; }
+  .q-desc { font-size: 11px; color: var(--ink-dim); margin-top: 2px; line-height: 1.35; }
+  .q-meta {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 5px;
+    font-family: var(--mono); font-size: 8.5px; letter-spacing: .06em; color: var(--ink-dim);
+  }
+  .chip {
+    padding: 1px 5px; border: 1px solid var(--edge-soft); border-radius: 2px;
+    text-transform: uppercase; letter-spacing: .1em;
+  }
+  .chip.dif { color: var(--candle); border-color: rgba(255,182,72,.32); }
+  .chip.time { color: var(--ink); }
+  .chip.time.urgente { color: var(--blood); border-color: rgba(196,68,46,.45); }
+  .q-rew { margin-left: auto; color: var(--gold); }
+
+  .q-burn {
+    background: none; border: 0; color: var(--ink-dim); cursor: pointer;
+    font-size: 13px; padding: 2px 3px; flex: none; line-height: 1;
+    opacity: 0; transition: opacity .15s, color .15s;
+  }
+  .quest:hover .q-burn, .q-burn:focus-visible { opacity: 1; }
+  .q-burn:hover { color: var(--blood); }
+
+  /* Fases (subtareas) */
+  .fases { padding: 0 9px 7px 34px; }
+  .fase {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--ink); cursor: pointer;
+    padding: 2px 0;
+  }
+  .fase:hover { color: var(--parchment); }
+  .fase i {
+    width: 11px; height: 11px; flex: none; border-radius: 2px;
+    border: 1px solid var(--edge); display: grid; place-items: center;
+    font-size: 8px; font-style: normal; color: transparent;
+  }
+  .fase.ok i { border-color: var(--moss); color: var(--moss); background: rgba(138,165,74,.14); }
+  .fase.ok  { text-decoration: line-through; color: var(--ink-dim); }
+
+  /* ── Kanban ────────────────────────────────────────────────────────────── */
+  .kanban { display: grid; grid-template-columns: repeat(3, minmax(112px, 1fr)); gap: 7px; }
+  .col-head {
+    font-family: var(--mono); font-size: 8px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-dim); padding: 4px 6px; border-bottom: 1px solid var(--edge-soft);
+    display: flex; justify-content: space-between; margin-bottom: 5px;
+  }
+  .kcard {
+    border: 1px solid var(--edge-soft); border-left: 2px solid var(--edge);
+    border-radius: var(--r); padding: 6px 7px; margin-bottom: 5px;
+    background: rgba(42,26,16,.6); font-size: 11.5px; line-height: 1.3;
+    cursor: grab;
+  }
+  .kcard:active { cursor: grabbing; }
+  .kcard.drag { opacity: .4; }
+  .kcard small {
+    display: block; margin-top: 3px;
+    font-family: var(--mono); font-size: 8px; letter-spacing: .08em;
+    color: var(--ink-dim); text-transform: uppercase;
+  }
+  .kcol.over { background: rgba(255,182,72,.06); border-radius: var(--r); outline: 1px dashed rgba(255,182,72,.3); }
+
+  /* ── Tienda / mochila ──────────────────────────────────────────────────── */
+  .item { display: flex; gap: 9px; align-items: flex-start; margin-bottom: 6px; }
+  .item .glyph {
+    width: 32px; height: 32px; flex: none; display: grid; place-items: center;
+    border: 1px solid var(--edge-soft); border-radius: var(--r);
+    background: rgba(0,0,0,.32); font-size: 16px;
+  }
+  .item h3 { font-size: 12.5px; font-weight: 600; color: var(--parchment); }
+  .item p { font-size: 10.5px; color: var(--ink-dim); line-height: 1.4; margin-top: 2px; }
+
+  button.act {
+    font-family: var(--mono); font-size: 9px; letter-spacing: .11em; text-transform: uppercase;
+    padding: 5px 9px; border-radius: var(--r); cursor: pointer;
+    border: 1px solid var(--edge); background: rgba(255,182,72,.09); color: var(--gold);
+    transition: background .15s, border-color .15s, color .15s;
+    white-space: nowrap;
+  }
+  button.act:hover:not(:disabled) { background: rgba(255,182,72,.2); border-color: var(--gold); }
+  button.act:disabled { opacity: .35; cursor: not-allowed; }
+  button.act.danger { color: var(--blood); border-color: rgba(196,68,46,.42); background: rgba(196,68,46,.09); }
+  button.act.danger:hover:not(:disabled) { background: rgba(196,68,46,.2); border-color: var(--blood); }
+  button.act.ghost { color: var(--ink-dim); background: none; }
+  button.act.ghost:hover:not(:disabled) { color: var(--parchment); background: rgba(255,255,255,.05); }
+
+  .empty {
+    text-align: center; padding: 22px 14px; color: var(--ink-dim);
+    font-size: 11.5px; border: 1px dashed var(--edge-soft); border-radius: var(--r);
+  }
+
+  /* ── Consola de comandos ───────────────────────────────────────────────── */
+  .console { margin-top: 8px; border-color: rgba(138,165,74,.3); }
+  .console input {
+    width: 100%; background: rgba(0,0,0,.5); color: var(--moss);
+    border: 1px solid var(--edge-soft); border-radius: 2px;
+    padding: 5px 7px; font-family: var(--mono); font-size: 10.5px;
+    letter-spacing: .09em; text-transform: uppercase;
+  }
+  .console input:focus { outline: 0; border-color: var(--moss); }
+  .console .out {
+    font-family: var(--mono); font-size: 9.5px; color: var(--ink-dim);
+    margin-top: 5px; min-height: 13px; letter-spacing: .04em;
+  }
+  .console .out.ok { color: var(--moss); }
+  .console .out.err { color: var(--blood); }
+
+  /* ── Formulario ────────────────────────────────────────────────────────── */
+  label.f { display: block; margin-bottom: 8px; }
+  label.f > span {
+    display: block; font-family: var(--mono); font-size: 8px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-dim); margin-bottom: 3px;
+  }
+  .f input, .f select, .f textarea {
+    width: 100%; background: rgba(0,0,0,.42); color: var(--parchment);
+    border: 1px solid var(--edge-soft); border-radius: 2px;
+    padding: 6px 7px; font-family: var(--serif); font-size: 12.5px;
+  }
+  .f input:focus, .f select:focus, .f textarea:focus { outline: 0; border-color: var(--candle); }
+  .f select option { background: var(--wood); }
+  .row { display: flex; gap: 7px; }
+  .row > * { flex: 1; min-width: 0; }
+
+  .fase-add { display: flex; gap: 5px; margin-top: 4px; }
+  .fase-add input { flex: 1; }
+  .fase-list { margin: 5px 0 0; list-style: none; }
+  .fase-list li {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11.5px; color: var(--ink); padding: 2px 0;
+  }
+  .fase-list li button {
+    margin-left: auto; background: none; border: 0; color: var(--ink-dim);
+    cursor: pointer; font-size: 12px; line-height: 1;
+  }
+  .fase-list li button:hover { color: var(--blood); }
+
+  /* ── Diálogos ──────────────────────────────────────────────────────────── */
+  .veil {
+    position: absolute; inset: 0; z-index: 20;
+    background: rgba(6,4,3,.8);
+    display: grid; place-items: center; padding: 12px;
+    animation: fade .18s ease-out;
+  }
+  @keyframes fade { from { opacity: 0; } }
+
+  .modal {
+    width: min(340px, 100%); max-height: 100%; overflow-y: auto;
+    border: 1px solid var(--edge); border-radius: 4px;
+    background: linear-gradient(165deg, #2a1a10, #150d07);
+    box-shadow: 0 14px 44px rgba(0,0,0,.75), 0 0 0 1px rgba(255,182,72,.08);
+    animation: rise .22s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.97); } }
+
+  .modal header {
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 11px; border-bottom: 1px solid var(--edge-soft);
+  }
+  .modal header h3 {
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--gold); font-weight: 600;
+  }
+  .modal header button {
+    margin-left: auto; background: none; border: 0; color: var(--ink-dim);
+    font-size: 15px; cursor: pointer; line-height: 1;
+  }
+  .modal header button:hover { color: var(--parchment); }
+  .modal .body { padding: 11px; }
+  .modal footer { display: flex; gap: 7px; justify-content: flex-end; padding: 0 11px 11px; }
+
+  /* Cofre de recompensa: sprite del APK, 192×32, 6 cuadros de 32×32.
+     Son 5 pasos, no 6: steps(5) hasta -320px muestra los cuadros 0…4 y deja
+     el 5 (el cofre abierto) fijo al terminar. Con steps(6) hasta -384px el
+     último fotograma cae fuera de la lámina y el cofre desaparece. */
+  .chest {
+    width: 64px; height: 64px; margin: 2px auto 10px;
+    background: url("img/chest-ss.png") 0 0 / 384px 64px;
+    image-rendering: pixelated;
+    animation: open-chest .6s steps(5) forwards;
+  }
+  @keyframes open-chest { to { background-position: -320px 0; } }
+
+  .reward { text-align: center; }
+  .reward .big {
+    font-family: var(--mono); font-size: 22px; color: var(--gold); font-weight: 700;
+    text-shadow: 0 0 16px rgba(255,182,72,.45);
+  }
+  .reward .sub { font-size: 11.5px; color: var(--ink-dim); margin-top: 3px; }
+
+  /* ── Migas de oro / XP que suben ───────────────────────────────────────── */
+  .float {
+    position: absolute; z-index: 30; pointer-events: none;
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    text-shadow: 0 2px 7px rgba(0,0,0,.85);
+    animation: rise-away 1.15s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  @keyframes rise-away {
+    0%   { opacity: 0; transform: translateY(4px) scale(.85); }
+    18%  { opacity: 1; transform: translateY(-5px) scale(1.05); }
+    100% { opacity: 0; transform: translateY(-42px) scale(1); }
+  }
+
+  /* ── Aviso inferior ────────────────────────────────────────────────────── */
+  .toast {
+    position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
+    z-index: 25; max-width: calc(100% - 24px);
+    padding: 6px 12px; border: 1px solid var(--edge); border-radius: var(--r);
+    background: rgba(26,16,9,.96); color: var(--parchment);
+    font-size: 11.5px; text-align: center; line-height: 1.35;
+    box-shadow: 0 6px 22px rgba(0,0,0,.6);
+    animation: toast-in .22s ease-out;
+  }
+  @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+  .toast.bad { border-color: rgba(196,68,46,.5); color: #e8a091; }
+
+  /* ── Botón flotante de crear ───────────────────────────────────────────── */
+  .fab {
+    position: absolute; right: 12px; bottom: 12px; z-index: 10;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--gold); cursor: pointer;
+    background: radial-gradient(circle at 50% 32%, #6b431f, #2a1a10);
+    color: var(--gold); font-size: 19px; line-height: 1;
+    box-shadow: 0 4px 16px rgba(0,0,0,.6), 0 0 16px rgba(255,182,72,.24);
+    transition: transform .16s, box-shadow .16s;
+  }
+  .fab:hover { transform: scale(1.08); box-shadow: 0 4px 20px rgba(0,0,0,.6), 0 0 24px rgba(255,182,72,.4); }
+
+  /* ── Sello de "recreación" ─────────────────────────────────────────────
+     Vive al pie del riel, no flotando sobre el lienzo: en el iframe sin
+     expandir se montaba encima de los paneles.
+     ──────────────────────────────────────────────────────────────────── */
+  .rail .info { margin-top: auto; font-size: 12px; opacity: .55; }
+  .rail .info:hover { opacity: 1; }
+
+  /* Pantallas muy bajas (el iframe sin expandir): apretamos todo. */
+  @media (max-height: 400px) {
+    .topbar { padding: 4px 8px; gap: 7px; }
+    .lvl { width: 27px; height: 27px; font-size: 11px; }
+    .scroll { padding: 7px 8px 12px; }
+    .fab { width: 32px; height: 32px; font-size: 16px; right: 9px; bottom: 9px; }
+    .flame { font-size: 18px; }
+  }
+  @media (max-width: 420px) {
+    .kanban { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="backdrop"></div>
+
+<div id="app">
+  <nav class="rail" id="rail"></nav>
+  <main class="stage">
+    <div class="topbar" id="topbar"></div>
+    <div class="tabs" id="tabs"></div>
+    <div class="scroll" id="view"></div>
+    <button class="fab" id="fab" title="Nuevo contrato" hidden>✚</button>
+  </main>
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Datos del juego.
+
+   Nombres, textos y mecánicas salen del APK original (libapp.so conservaba la
+   tabla de símbolos porque el build no estaba ofuscado). Los precios y las
+   fórmulas de recompensa son reconstruidos: esos vivían en el cuerpo de los
+   métodos, que sí se perdió al compilar a AOT.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const CATEGORIAS = ["Gimnasio", "Estudio", "Trabajo", "Hogar", "Mini Boss"];
+
+const DIFICULTADES = {
+  "Trivial":  { xp:  10, oro:  5, dmg:  20 },
+  "Normal":   { xp:  25, oro: 15, dmg:  50 },
+  "Ardua":    { xp:  60, oro: 40, dmg: 120 },
+  "Épica":    { xp: 140, oro: 95, dmg: 300 },
+};
+
+const TIENDA = [
+  {
+    id: "sello_mercenario",
+    glyph: "🗡️",
+    nombre: "Sello de Mercenario",
+    precio: 120,
+    desc: "Completa un contrato al instante desde el inventario sin otorgar oro ni experiencia.",
+    usoDesc: "El mercenario hará el trabajo por ti. No ganarás Oro ni Experiencia.",
+  },
+  {
+    id: "reloj_cronomante",
+    glyph: "⏳",
+    nombre: "Reloj de Arena del Cronomante",
+    precio: 260,
+    desc: "Revive un contrato vencido automáticamente. Restaura el 100% de oro y experiencia.",
+    auto: true,
+  },
+  {
+    id: "brebaje_concentracion",
+    glyph: "🧪",
+    nombre: "Brebaje de la Concentración",
+    precio: 180,
+    desc: "Duplica la XP ganada, pero reduce a 0 el oro obtenido durante las próximas 3 misiones.",
+  },
+  {
+    id: "pocion_preentreno",
+    glyph: "⚗️",
+    nombre: "Poción de Pre-Entrenamiento",
+    precio: 150,
+    desc: "Otorga un bono plano de +50 de daño extra al Jefe en misiones de la categoría Gimnasio.",
+  },
+  {
+    id: "colmillo_critico",
+    glyph: "🦷",
+    nombre: "Colmillo del Jabalí",
+    precio: 200,
+    desc: "El próximo ataque contra un Mini Boss infligirá daño crítico duplicado (x2).",
+  },
+];
+
+/* Los códigos de la DEV CONSOLE estaban en el binario, en TiendaPage. */
+const COMANDOS = {
+  GREEDISGOOD: { oro: 500,  msg: "+500 de oro. El tabernero no pregunta." },
+  MOTHERLODE:  { oro: 1000, msg: "+1000 de oro. La veta era buena." },
+  ROBINHOOD:   { oro: 250, xp: 250, msg: "+250 de oro y +250 de fama." },
+};
+
+const COLUMNAS = [
+  { id: "backlog", label: "Por Forjar" },
+  { id: "forja",   label: "En la Forja" },
+  { id: "forjado", label: "Forjado" },
+];
+
+const SECCIONES = [
+  { id: "cantina",    icon: "🍺", label: "La Cantina" },
+  { id: "tienda",     icon: "🏪", label: "La Tienda" },
+  { id: "inventario", icon: "🎒", label: "Tu Mochila" },
+  { id: "ajustes",    icon: "⚙️", label: "Ajustes" },
+];
+
+const PESTANAS = [
+  { id: "misiones", label: "Misiones" },
+  { id: "mesa",     label: "Mesa de Estrategia" },
+  { id: "fama",     label: "Progreso de Fama" },
+];
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Estado
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const CLAVE = "tavernquest.demo.v1";
+let uid = 0;
+const nid = () => "q" + (++uid) + "-" + Math.random().toString(36).slice(2, 7);
+
+/** Horas desde ahora, en milisegundos absolutos. */
+const enHoras = (h) => Date.now() + h * 3600e3;
+
+function estadoInicial() {
+  uid = 0;
+  return {
+    cantina: "El Refugio del Jabalí",
+    nivel: 7,
+    xp: 240,
+    oro: 385,
+    racha: 4,
+    fogataViva: true,
+    jefesCaidos: 3,
+    boss: { nivel: 4, hp: 620, max: 900 },
+    mochila: { sello_mercenario: 1, reloj_cronomante: 0, brebaje_concentracion: 0, pocion_preentreno: 0, colmillo_critico: 0 },
+    ajustes: { vibracion: true, notificaciones: true, hardcore: false },
+    misiones: [
+      { id: nid(), titulo: "Rutina de empuje", desc: "Pecho, hombro y tríceps.", cat: "Gimnasio", dif: "Ardua",
+        vence: enHoras(6), col: "forja", hecha: false,
+        fases: [ {t:"Calentamiento", ok:true}, {t:"4×8 press banca", ok:true}, {t:"Accesorios", ok:false} ] },
+      { id: nid(), titulo: "Terminar el informe de arquitectura", desc: "Diagramas + capítulo de riesgos.", cat: "Trabajo", dif: "Épica",
+        vence: enHoras(29), col: "forja", hecha: false,
+        fases: [ {t:"Diagrama de contexto", ok:true}, {t:"Diagrama de componentes", ok:false}, {t:"Riesgos", ok:false} ] },
+      { id: nid(), titulo: "Repasar Flutter — capa de datos", desc: "", cat: "Estudio", dif: "Normal",
+        vence: enHoras(2), col: "backlog", hecha: false, fases: [] },
+      { id: nid(), titulo: "Derrotar al Jabalí Alado", desc: "Contrato de jefe del tablón.", cat: "Mini Boss", dif: "Épica",
+        vence: enHoras(52), col: "backlog", hecha: false,
+        fases: [ {t:"Reunir provisiones", ok:false}, {t:"Emboscada en el claro", ok:false} ] },
+      { id: nid(), titulo: "Lavar la loza de la taberna", desc: "", cat: "Hogar", dif: "Trivial",
+        vence: enHoras(-3), col: "backlog", hecha: false, fases: [] },
+      { id: nid(), titulo: "Caminata de 5 km", desc: "", cat: "Gimnasio", dif: "Normal",
+        vence: enHoras(-19), col: "forjado", hecha: true, fases: [] },
+      { id: nid(), titulo: "Pagar al herrero", desc: "", cat: "Hogar", dif: "Trivial",
+        vence: enHoras(-26), col: "forjado", hecha: true, fases: [] },
+    ],
+  };
+}
+
+function xpNecesaria(nivel) { return 100 + nivel * 60; }
+
+let S = cargar();
+let seccion = "cantina";
+let pestana = "misiones";
+
+function cargar() {
+  try {
+    const crudo = localStorage.getItem(CLAVE);
+    if (!crudo) return estadoInicial();
+    const s = JSON.parse(crudo);
+    // Si el guardado es de otra forma, mejor arrancar limpio que romper.
+    if (!s || !Array.isArray(s.misiones) || typeof s.oro !== "number") return estadoInicial();
+    return s;
+  } catch { return estadoInicial(); }
+}
+
+function guardar() {
+  try { localStorage.setItem(CLAVE, JSON.stringify(S)); } catch { /* modo privado: da igual */ }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Utilidades
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const $  = (sel, raiz = document) => raiz.querySelector(sel);
+const el = (tag, props = {}, ...hijos) => {
+  const n = Object.assign(document.createElement(tag), props);
+  for (const h of hijos.flat()) if (h != null) n.append(h);
+  return n;
+};
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const vencida = (q) => !q.hecha && q.vence < Date.now();
+
+/** El texto del QuestCountdown original: cuánto falta, o cuánto lleva vencida. */
+function restante(ms) {
+  const d = ms - Date.now();
+  const abs = Math.abs(d);
+  const min = Math.floor(abs / 60000);
+  const h = Math.floor(min / 60);
+  const dias = Math.floor(h / 24);
+  let t;
+  if (dias > 0)     t = dias + "d " + (h % 24) + "h";
+  else if (h > 0)   t = h + "h " + (min % 60) + "m";
+  else              t = min + "m";
+  return d < 0 ? "vencida hace " + t : "faltan " + t;
+}
+
+function recompensa(q) {
+  const base = DIFICULTADES[q.dif] || DIFICULTADES.Normal;
+  const brebaje = S.mochila.brebaje_concentracion > 0;
+  return {
+    xp:  brebaje ? base.xp * 2 : base.xp,
+    oro: brebaje ? 0 : base.oro,
+    dmg: base.dmg + (q.cat === "Gimnasio" && S.mochila.pocion_preentreno > 0 ? 50 : 0),
+  };
+}
+
+let toastTimer;
+function avisar(msg, malo = false) {
+  $(".toast")?.remove();
+  const t = el("div", { className: "toast" + (malo ? " bad" : ""), textContent: msg });
+  $(".stage").append(t);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.remove(), 2800);
+  if (S.ajustes.vibracion && navigator.vibrate) { try { navigator.vibrate(malo ? 40 : 14); } catch {} }
+}
+
+/** Número que sube y se desvanece, anclado a un elemento. */
+function flotar(texto, color, ancla) {
+  const stage = $(".stage");
+  const r = ancla.getBoundingClientRect();
+  const rs = stage.getBoundingClientRect();
+  const n = el("div", { className: "float", textContent: texto });
+  n.style.color = color;
+  n.style.left = (r.left - rs.left + r.width / 2 - 16) + "px";
+  n.style.top  = (r.top  - rs.top  - 4) + "px";
+  stage.append(n);
+  setTimeout(() => n.remove(), 1200);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Reglas
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function darXP(n) {
+  S.xp += n;
+  let subio = false;
+  while (S.xp >= xpNecesaria(S.nivel)) { S.xp -= xpNecesaria(S.nivel); S.nivel++; subio = true; }
+  return subio;
+}
+
+function completar(q, ancla) {
+  if (q.hecha) return;
+  const r = recompensa(q);
+  q.hecha = true;
+  q.col = "forjado";
+  q.fases.forEach((f) => (f.ok = true));
+
+  if (S.mochila.brebaje_concentracion > 0) S.mochila.brebaje_concentracion--;
+
+  const subio = darXP(r.xp);
+  S.oro += r.oro;
+
+  // La fogata sólo se enciende con contratos que no estén vencidos.
+  if (!vencida(q)) { S.racha++; S.fogataViva = true; }
+
+  let golpe = 0;
+  if (q.cat === "Mini Boss") {
+    golpe = r.dmg;
+    if (S.mochila.colmillo_critico > 0) { golpe *= 2; S.mochila.colmillo_critico--; }
+    if (q.cat === "Gimnasio" && S.mochila.pocion_preentreno > 0) S.mochila.pocion_preentreno--;
+    S.boss.hp = Math.max(0, S.boss.hp - golpe);
+  }
+
+  if (ancla) {
+    flotar("+" + r.xp + " XP", "#ffd479", ancla);
+    if (r.oro) setTimeout(() => flotar("+" + r.oro + " ⛁", "#ffb648", ancla), 160);
+  }
+
+  guardar();
+  pintar();
+
+  if (golpe) {
+    const b = $(".boss");
+    if (b) { b.classList.add("hit"); setTimeout(() => b.classList.remove("hit"), 360); }
+  }
+
+  if (S.boss.hp === 0) { setTimeout(jefeCaido, 420); return; }
+  if (subio) { setTimeout(() => cofre("¡NIVEL " + S.nivel + "!", "Tu fama crece en la comarca."), 380); return; }
+  if (Math.random() < 0.3) {
+    const oro = 20 + Math.floor(Math.random() * 60);
+    S.oro += oro; guardar();
+    setTimeout(() => { cofre("+" + oro + " ⛁", "Un parroquiano agradecido dejó esto en la barra."); pintar(); }, 380);
+  }
+}
+
+function jefeCaido() {
+  S.jefesCaidos++;
+  const botin = 150 + S.boss.nivel * 45;
+  S.oro += botin;
+  darXP(120);
+  S.boss = { nivel: S.boss.nivel + 1, hp: 900 + S.boss.nivel * 260, max: 900 + S.boss.nivel * 260 };
+  guardar();
+  pintar();
+  cofre("+" + botin + " ⛁", "El Jabalí Alado ha caído. Un jefe más fuerte ronda el bosque.");
+}
+
+function incinerar(q, tarjeta) {
+  // "Incinerar Contrato" — en Modo Hierro el original castigaba abandonar.
+  const castigo = S.ajustes.hardcore && !q.hecha;
+  tarjeta.classList.add("saliendo");
+  setTimeout(() => {
+    S.misiones = S.misiones.filter((m) => m.id !== q.id);
+    if (castigo) { S.oro = Math.max(0, S.oro - 25); avisar("Modo Hierro: −25 de oro por abandonar el contrato.", true); }
+    guardar(); pintar();
+  }, 400);
+}
+
+/** Barrido de vencidos: el Reloj de Arena los revive solo, como en el original. */
+function revisarVencidos() {
+  let revividos = 0;
+  for (const q of S.misiones) {
+    if (vencida(q) && !q.avisada) {
+      q.avisada = true;
+      if (S.mochila.reloj_cronomante > 0) {
+        S.mochila.reloj_cronomante--;
+        q.vence = enHoras(24);
+        q.avisada = false;
+        revividos++;
+      }
+    }
+  }
+  if (revividos) { guardar(); avisar("El Reloj de Arena revivió " + revividos + " contrato(s)."); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Diálogos
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function cerrarModal() { $(".veil")?.remove(); }
+
+function modal(titulo, cuerpo, pie) {
+  cerrarModal();
+  const cerrar = el("button", { type: "button", textContent: "✕", title: "Cerrar" });
+  cerrar.onclick = cerrarModal;
+  const caja = el("div", { className: "modal" },
+    el("header", {}, el("h3", { textContent: titulo }), cerrar),
+    el("div", { className: "body" }, cuerpo),
+    pie ? el("footer", {}, pie) : null,
+  );
+  const velo = el("div", { className: "veil" }, caja);
+  velo.addEventListener("mousedown", (e) => { if (e.target === velo) cerrarModal(); });
+  $(".stage").append(velo);
+  return caja;
+}
+
+function cofre(grande, sub) {
+  const ok = el("button", { className: "act", type: "button", textContent: "Recoger" });
+  ok.onclick = cerrarModal;
+  modal("Cofre de recompensa",
+    el("div", { className: "reward" },
+      el("div", { className: "chest" }),
+      el("div", { className: "big", textContent: grande }),
+      el("div", { className: "sub", textContent: sub }),
+    ), ok);
+}
+
+function dialogoCrear() {
+  const fases = [];
+
+  const titulo = el("input", { type: "text", placeholder: "Título del contrato", maxLength: 70 });
+  const desc   = el("textarea", { rows: 2, placeholder: "Descripción del Contrato (Opcional)", maxLength: 160 });
+  const cat    = el("select", {}, ...CATEGORIAS.map((c) => el("option", { value: c, textContent: c })));
+  const dif    = el("select", {}, ...Object.keys(DIFICULTADES).map((d) =>
+                   el("option", { value: d, textContent: d + " · " + DIFICULTADES[d].xp + " XP" })));
+  dif.value = "Normal";
+
+  const hoy = new Date(Date.now() + 864e5);
+  const fecha = el("input", { type: "date", value: hoy.toISOString().slice(0, 10) });
+  const hora  = el("input", { type: "time", value: "20:00" });
+
+  const lista = el("ul", { className: "fase-list" });
+  const nuevaFase = el("input", { type: "text", placeholder: "Añadir fase…", maxLength: 60 });
+  const addBtn = el("button", { className: "act ghost", type: "button", textContent: "+" });
+
+  function pintarFases() {
+    lista.replaceChildren(...fases.map((f, i) => {
+      const quitar = el("button", { type: "button", textContent: "✕", title: "Quitar" });
+      quitar.onclick = () => { fases.splice(i, 1); pintarFases(); };
+      return el("li", {}, el("span", { textContent: "▸ " + f }), quitar);
+    }));
+  }
+  function agregarFase() {
+    const v = nuevaFase.value.trim();
+    if (!v) return;
+    fases.push(v); nuevaFase.value = ""; pintarFases(); nuevaFase.focus();
+  }
+  addBtn.onclick = agregarFase;
+  nuevaFase.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); agregarFase(); } });
+
+  const cuerpo = el("div", {},
+    el("label", { className: "f" }, el("span", { textContent: "Título de la Misión" }), titulo),
+    el("label", { className: "f" }, el("span", { textContent: "Descripción del Contrato (Opcional)" }), desc),
+    el("div", { className: "row" },
+      el("label", { className: "f" }, el("span", { textContent: "Categoría del Contrato" }), cat),
+      el("label", { className: "f" }, el("span", { textContent: "Dificultad de Campaña" }), dif),
+    ),
+    el("div", { className: "row" },
+      el("label", { className: "f" }, el("span", { textContent: "Selecciona fecha" }), fecha),
+      el("label", { className: "f" }, el("span", { textContent: "Hora" }), hora),
+    ),
+    el("label", { className: "f" }, el("span", { textContent: "Fases de la misión" }),
+      el("div", { className: "fase-add" }, nuevaFase, addBtn), lista),
+  );
+
+  const cancelar = el("button", { className: "act ghost", type: "button", textContent: "Cancelar" });
+  cancelar.onclick = cerrarModal;
+  const invocar = el("button", { className: "act", type: "button", textContent: "Invocar contrato" });
+
+  invocar.onclick = () => {
+    const t = titulo.value.trim();
+    if (!t) { avisar("El tablón exige un título", true); titulo.focus(); return; }
+    if (cat.value === "Mini Boss" && fases.length === 0) {
+      avisar("Agrega al menos 1 fase para invocar al Jefe automáticamente.", true); return;
+    }
+    const cuando = new Date(fecha.value + "T" + (hora.value || "23:59")).getTime();
+    S.misiones.unshift({
+      id: nid(), titulo: t, desc: desc.value.trim(),
+      cat: cat.value, dif: dif.value,
+      vence: Number.isFinite(cuando) ? cuando : enHoras(24),
+      col: "backlog", hecha: false,
+      fases: fases.map((f) => ({ t: f, ok: false })),
+    });
+    guardar(); cerrarModal(); pestana = "misiones"; pintar();
+    avisar("Contrato clavado en el tablón.");
+  };
+
+  modal("Invocar contrato jefe", cuerpo, [cancelar, invocar]);
+  setTimeout(() => titulo.focus(), 60);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Vistas
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function vistaMisiones() {
+  const lado = el("div", { className: "col-side" });
+  const cuerpo = el("div", { className: "col-main" });
+
+  /* — El Jefe — */
+  const b = S.boss;
+  const pct = (b.hp / b.max) * 100;
+  lado.append(
+    el("h2", { className: "sect", textContent: "Contrato de Jefe" }),
+    el("div", { className: "panel boss" },
+      el("div", { className: "boss-head" },
+        el("span", { textContent: "🐗", style: "font-size:17px" }),
+        el("span", { className: "name", textContent: "El Jabalí Alado" }),
+        el("span", { className: "lv", textContent: "Nv " + b.nivel }),
+      ),
+      el("div", { className: "bar" }, Object.assign(el("i"), { style: "width:" + pct + "%" })),
+      el("div", { className: "boss-hp" },
+        el("span", { textContent: b.hp + " / " + b.max + " PV" }),
+        el("span", { textContent: "Jefes caídos: " + S.jefesCaidos }),
+      ),
+      el("div", { className: "boss-hint", textContent: 'Completa misiones de tipo "Mini Boss" para hacer daño.' }),
+    ),
+  );
+
+  /* — Fogata — */
+  lado.append(
+    el("h2", { className: "sect", textContent: "Fogata de constancia" }),
+    el("div", { className: "panel fogata" },
+      el("span", { className: "flame " + (S.fogataViva ? "on" : "off"), textContent: "🔥" }),
+      el("div", {},
+        el("span", { className: "n", textContent: "Racha x" + S.racha }),
+        el("small", { textContent: "Completa un contrato diario para mantener el fuego." }),
+        el("small", { textContent: "Renace cada medianoche. Genera rachas." }),
+      ),
+    ),
+  );
+
+  /* — Contratos — */
+  const activas = S.misiones.filter((q) => !q.hecha);
+  const hechas  = S.misiones.filter((q) => q.hecha);
+
+  cuerpo.append(el("h2", { className: "sect", textContent: "Misiones para el día" }));
+  if (activas.length === 0) {
+    cuerpo.append(el("div", { className: "empty", textContent: "No hay contratos activos." }));
+  } else {
+    cuerpo.append(...activas.map(tarjetaQuest));
+  }
+
+  if (hechas.length) {
+    cuerpo.append(el("h2", { className: "sect", textContent: "Cumplidas" }));
+    cuerpo.append(...hechas.slice(0, 4).map(tarjetaQuest));
+  }
+
+  if (activas.some(vencida)) {
+    cuerpo.append(el("p", {
+      textContent: "Las misiones vencidas te QUITAN oro y experiencia.",
+      style: "font-size:10.5px;color:var(--blood);margin-top:9px;text-align:center",
+    }));
+  }
+  return el("div", { className: "mis-grid" }, lado, cuerpo);
+}
+
+function tarjetaQuest(q) {
+  const venc = vencida(q);
+  const r = recompensa(q);
+
+  const check = el("div", {
+    className: "q-check", role: "checkbox", tabIndex: 0,
+    textContent: "✔",
+  });
+  check.setAttribute("aria-checked", String(q.hecha));
+  check.setAttribute("aria-label", "Completar " + q.titulo);
+
+  const quemar = el("button", { className: "q-burn", type: "button", textContent: "🔥", title: "Incinerar Contrato" });
+
+  const tarjeta = el("article", { className: "quest" + (venc ? " vencida" : "") + (q.hecha ? " hecha" : "") },
+    el("div", { className: "q-main" },
+      check,
+      el("div", { className: "q-body" },
+        el("div", { className: "q-title", textContent: q.titulo }),
+        q.desc ? el("div", { className: "q-desc", textContent: q.desc }) : null,
+        el("div", { className: "q-meta" },
+          el("span", { className: "chip", textContent: q.cat }),
+          el("span", { className: "chip dif", textContent: q.dif }),
+          el("span", { className: "chip time" + (venc ? " urgente" : ""), textContent: restante(q.vence) }),
+          q.hecha ? null : el("span", { className: "q-rew", textContent: "+" + r.xp + " XP · +" + r.oro + " ⛁" }),
+        ),
+      ),
+      quemar,
+    ),
+  );
+  tarjeta.dataset.cat = q.cat;
+
+  if (q.fases.length) {
+    const cont = el("div", { className: "fases" });
+    q.fases.forEach((f, i) => {
+      const fila = el("div", { className: "fase" + (f.ok ? " ok" : "") },
+        el("i", { textContent: "✔" }), el("span", { textContent: f.t }));
+      fila.onclick = () => {
+        if (q.hecha) return;
+        q.fases[i].ok = !q.fases[i].ok;
+        // Todas las fases marcadas ⇒ el contrato se cumple solo.
+        if (q.fases.every((x) => x.ok)) completar(q, tarjeta);
+        else { guardar(); pintar(); }
+      };
+      cont.append(fila);
+    });
+    tarjeta.append(cont);
+  }
+
+  const marcar = () => completar(q, tarjeta);
+  check.onclick = marcar;
+  check.onkeydown = (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); marcar(); } };
+  quemar.onclick = () => incinerar(q, tarjeta);
+
+  return tarjeta;
+}
+
+function vistaMesa() {
+  const cont = el("div", { className: "kanban" });
+
+  for (const col of COLUMNAS) {
+    const dentro = S.misiones.filter((q) => (q.col || "backlog") === col.id);
+    const zona = el("div", { className: "kcol" },
+      el("div", { className: "col-head" },
+        el("span", { textContent: col.label }),
+        el("span", { textContent: String(dentro.length) }),
+      ),
+    );
+    zona.dataset.col = col.id;
+
+    for (const q of dentro) {
+      const c = el("div", { className: "kcard", draggable: true },
+        el("span", { textContent: q.titulo }),
+        el("small", { textContent: q.cat + " · " + q.dif }),
+      );
+      c.dataset.id = q.id;
+      c.style.borderLeftColor = getComputedStyle(document.documentElement)
+        .getPropertyValue(q.cat === "Mini Boss" ? "--blood" : "--edge") || "";
+      c.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", q.id);
+        e.dataTransfer.effectAllowed = "move";
+        c.classList.add("drag");
+      });
+      c.addEventListener("dragend", () => c.classList.remove("drag"));
+      zona.append(c);
+    }
+
+    zona.addEventListener("dragover", (e) => { e.preventDefault(); zona.classList.add("over"); });
+    zona.addEventListener("dragleave", () => zona.classList.remove("over"));
+    zona.addEventListener("drop", (e) => {
+      e.preventDefault();
+      zona.classList.remove("over");
+      const id = e.dataTransfer.getData("text/plain");
+      const q = S.misiones.find((m) => m.id === id);
+      if (!q) return;
+      q.col = col.id;
+      if (col.id === "forjado" && !q.hecha) { completar(q, null); return; }
+      guardar(); pintar();
+    });
+
+    cont.append(zona);
+  }
+
+  const nota = el("p", {
+    textContent: "Arrastra los contratos entre columnas. Soltar en Forjado los completa.",
+    style: "font-size:10.5px;color:var(--ink-dim);margin-top:9px;text-align:center",
+  });
+
+  return el("div", {}, el("h2", { className: "sect", textContent: "Mesa de estrategia" }), cont, nota);
+}
+
+function vistaFama() {
+  const hechas = S.misiones.filter((q) => q.hecha).length;
+  const activas = S.misiones.length - hechas;
+  const venc = S.misiones.filter(vencida).length;
+
+  const porCat = {};
+  for (const q of S.misiones) porCat[q.cat] = (porCat[q.cat] || 0) + 1;
+
+  const stat = (n, l, color) => el("div", { className: "panel", style: "text-align:center;padding:8px 6px" },
+    el("div", { textContent: String(n), style: "font-family:var(--mono);font-size:19px;font-weight:700;color:" + color }),
+    el("div", { textContent: l, style: "font-family:var(--mono);font-size:7.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-dim);margin-top:2px" }),
+  );
+
+  const barras = el("div", { className: "panel" },
+    ...Object.entries(porCat).map(([c, n]) => {
+      const pct = Math.round((n / S.misiones.length) * 100);
+      return el("div", { style: "margin-bottom:7px" },
+        el("div", { style: "display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--ink-dim);margin-bottom:3px" },
+          el("span", { textContent: c }), el("span", { textContent: n + " · " + pct + "%" })),
+        el("div", { className: "bar" }, Object.assign(el("i"), { style: "width:" + pct + "%" })),
+      );
+    }),
+  );
+
+  return el("div", {},
+    el("h2", { className: "sect", textContent: "Salón de la fama" }),
+    el("div", { style: "display:grid;grid-template-columns:repeat(3,1fr);gap:7px" },
+      stat(hechas, "Cumplidas", "var(--moss)"),
+      stat(activas, "Activas", "var(--gold)"),
+      stat(venc, "Vencidas", "var(--blood)"),
+    ),
+    el("h2", { className: "sect", textContent: "Reparto por categoría" }),
+    barras,
+    el("h2", { className: "sect", textContent: "Jefes caídos" }),
+    el("div", { className: "panel", style: "text-align:center" },
+      el("div", { textContent: "🐗 ".repeat(Math.min(S.jefesCaidos, 8)).trim() || "—", style: "font-size:17px;letter-spacing:2px" }),
+      el("div", { textContent: S.jefesCaidos + " jefes derrotados", style: "font-size:10.5px;color:var(--ink-dim);margin-top:5px" }),
+    ),
+  );
+}
+
+function vistaTienda() {
+  const frag = document.createDocumentFragment();
+  frag.append(
+    el("h2", { className: "sect", textContent: "La tienda de la cantina" }),
+    el("p", { textContent: "Armas, pociones y mejoras", style: "font-size:11px;color:var(--ink-dim);margin-bottom:9px" }),
+  );
+
+  for (const it of TIENDA) {
+    const btn = el("button", { className: "act", type: "button", textContent: "Comprar (" + it.precio + " ⛁)" });
+    btn.disabled = S.oro < it.precio;
+    btn.onclick = () => {
+      if (S.oro < it.precio) { avisar("No te alcanza el oro.", true); return; }
+      S.oro -= it.precio;
+      S.mochila[it.id] = (S.mochila[it.id] || 0) + 1;
+      guardar(); pintar();
+      avisar(it.nombre + " añadido a tu mochila.");
+    };
+    frag.append(el("div", { className: "panel", style: "margin-bottom:6px" },
+      el("div", { className: "item" },
+        el("div", { className: "glyph", textContent: it.glyph }),
+        el("div", { style: "flex:1;min-width:0" },
+          el("h3", { textContent: it.nombre }),
+          el("p", { textContent: it.desc }),
+          it.auto ? el("p", { textContent: "Se activa automáticamente", style: "color:var(--moss);font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;margin-top:4px" }) : null,
+        ),
+      ),
+      el("div", { style: "display:flex;justify-content:flex-end;margin-top:6px" }, btn),
+    ));
+  }
+
+  /* — DEV CONSOLE — */
+  const entrada = el("input", { type: "text", placeholder: "escribe un comando…", spellcheck: false });
+  const salida = el("div", { className: "out", textContent: "" });
+  const ejecutar = el("button", { className: "act ghost", type: "button", textContent: "Ejecutar" });
+
+  const correr = () => {
+    const cmd = entrada.value.trim().toUpperCase();
+    if (!cmd) return;
+    const c = COMANDOS[cmd];
+    if (!c) {
+      salida.className = "out err";
+      salida.textContent = "Comando no reconocido.";
+    } else {
+      if (c.oro) S.oro += c.oro;
+      if (c.xp) darXP(c.xp);
+      salida.className = "out ok";
+      salida.textContent = c.msg;
+      guardar();
+      pintarTop();
+      // Rehabilita los botones de compra que ahora sí se pueden pagar.
+      for (const b of document.querySelectorAll(".panel button.act")) {
+        const m = /\((\d+) ⛁\)/.exec(b.textContent);
+        if (m) b.disabled = S.oro < Number(m[1]);
+      }
+    }
+    entrada.value = "";
+  };
+  ejecutar.onclick = correr;
+  entrada.addEventListener("keydown", (e) => { if (e.key === "Enter") correr(); });
+
+  frag.append(el("div", { className: "panel console" },
+    el("h2", { className: "sect", textContent: "Dev console", style: "margin-top:0" }),
+    el("div", { style: "display:flex;gap:6px" }, entrada, ejecutar),
+    salida,
+  ));
+
+  return frag;
+}
+
+function vistaInventario() {
+  const frag = document.createDocumentFragment();
+  frag.append(el("h2", { className: "sect", textContent: "Tu mochila" }));
+
+  const tengo = TIENDA.filter((it) => (S.mochila[it.id] || 0) > 0);
+  if (!tengo.length) {
+    frag.append(el("div", { className: "empty", textContent: "No tienes Sellos de Mercenario en tu mochila." }));
+    return frag;
+  }
+
+  for (const it of tengo) {
+    const n = S.mochila[it.id];
+    let accion = null;
+
+    if (it.id === "sello_mercenario") {
+      const btn = el("button", { className: "act", type: "button", textContent: "Usar sello" });
+      btn.onclick = () => usarSello();
+      accion = btn;
+    }
+
+    frag.append(el("div", { className: "panel", style: "margin-bottom:6px" },
+      el("div", { className: "item" },
+        el("div", { className: "glyph", textContent: it.glyph }),
+        el("div", { style: "flex:1;min-width:0" },
+          el("h3", { textContent: it.nombre + "  ×" + n }),
+          el("p", { textContent: it.usoDesc || it.desc }),
+        ),
+      ),
+      accion ? el("div", { style: "display:flex;justify-content:flex-end;margin-top:6px" }, accion) : null,
+    ));
+  }
+  return frag;
+}
+
+/** El "_mostrarSelectorDeMisionesParaSello" del original. */
+function usarSello() {
+  const activas = S.misiones.filter((q) => !q.hecha);
+  if (!activas.length) { avisar("No hay contratos activos.", true); return; }
+
+  const lista = el("div", {});
+  for (const q of activas) {
+    const b = el("button", {
+      className: "act ghost", type: "button",
+      style: "display:block;width:100%;text-align:left;margin-bottom:5px;text-transform:none;font-family:var(--serif);font-size:12px;letter-spacing:0",
+      textContent: q.titulo,
+    });
+    b.onclick = () => {
+      S.mochila.sello_mercenario--;
+      q.hecha = true; q.col = "forjado"; q.fases.forEach((f) => (f.ok = true));
+      guardar(); cerrarModal(); pintar();
+      avisar("El mercenario hará el trabajo por ti. No ganarás Oro ni Experiencia.");
+    };
+    lista.append(b);
+  }
+
+  modal("Usar en un contrato", el("div", {},
+    el("p", { textContent: "El mercenario hará el trabajo por ti. No ganarás Oro ni Experiencia.",
+              style: "font-size:11px;color:var(--ink-dim);margin-bottom:9px;line-height:1.4" }),
+    lista,
+  ));
+}
+
+function vistaAjustes() {
+  const frag = document.createDocumentFragment();
+
+  const toggle = (clave, nombre, sub) => {
+    const on = S.ajustes[clave];
+    const btn = el("button", {
+      className: "act" + (on ? "" : " ghost"), type: "button",
+      textContent: on ? "Activado" : "Apagado",
+    });
+    btn.onclick = () => { S.ajustes[clave] = !S.ajustes[clave]; guardar(); pintar(); };
+    return el("div", { className: "panel", style: "margin-bottom:6px" },
+      el("div", { style: "display:flex;align-items:center;gap:9px" },
+        el("div", { style: "flex:1;min-width:0" },
+          el("h3", { textContent: nombre, style: "font-size:12.5px" }),
+          el("p", { textContent: sub, style: "font-size:10.5px;color:var(--ink-dim);margin-top:2px;line-height:1.35" }),
+        ), btn),
+    );
+  };
+
+  frag.append(
+    el("h2", { className: "sect", textContent: "Alertas de la cantina" }),
+    toggle("notificaciones", "Alertas de la Cantina", "Permite que la app te avise de contratos."),
+    toggle("vibracion", "Vibración Activa", "Respuesta háptica al cumplir un contrato."),
+    el("h2", { className: "sect", textContent: "Reglas del gremio" }),
+    toggle("hardcore", "Modo Hierro (Hardcore)", "Incinerar un contrato sin cumplirlo te cuesta 25 de oro."),
+  );
+
+  const reiniciar = el("button", { className: "act danger", type: "button", textContent: "Reiniciar progreso" });
+  reiniciar.onclick = () => {
+    const si = el("button", { className: "act danger", type: "button", textContent: "Sí, reiniciar" });
+    const no = el("button", { className: "act ghost", type: "button", textContent: "Cancelar" });
+    no.onclick = cerrarModal;
+    si.onclick = () => { S = estadoInicial(); guardar(); cerrarModal(); seccion = "cantina"; pestana = "misiones"; pintar(); avisar("Progreso reiniciado."); };
+    modal("Zona de peligro",
+      el("p", { textContent: "Vuelve a Nivel 1. Acción irreversible: se borran contratos, oro y racha.",
+                style: "font-size:12px;line-height:1.45" }), [no, si]);
+  };
+
+  frag.append(
+    el("h2", { className: "sect", textContent: "Zona de peligro" }),
+    el("div", { className: "panel", style: "display:flex;justify-content:flex-end" }, reiniciar),
+  );
+
+  return frag;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Pintado
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function pintarRail() {
+  const rail = $("#rail");
+  rail.replaceChildren(el("div", { className: "rail-logo", title: "TavernQuest" }));
+  for (const s of SECCIONES) {
+    const b = el("button", { type: "button" },
+      el("span", { textContent: s.icon }),
+      el("span", { className: "tip", textContent: s.label }),
+    );
+    b.setAttribute("aria-current", String(seccion === s.id));
+    b.onclick = () => { seccion = s.id; pintar(); };
+    rail.append(b);
+  }
+
+  const info = el("button", { className: "info", type: "button", title: "Sobre esta demo" },
+    el("span", { textContent: "ⓘ" }),
+    el("span", { className: "tip", textContent: "Sobre esta demo" }),
+  );
+  info.onclick = mostrarInfo;
+  rail.append(info);
+}
+
+function pintarTop() {
+  const necesita = xpNecesaria(S.nivel);
+  const pct = Math.min(100, (S.xp / necesita) * 100);
+  $("#topbar").replaceChildren(
+    el("div", { className: "lvl", textContent: String(S.nivel), title: "Nivel " + S.nivel }),
+    el("div", { className: "fama" },
+      el("div", { className: "fama-top" },
+        el("span", { textContent: S.cantina }),
+        el("span", { textContent: S.xp + " / " + necesita + " fama" }),
+      ),
+      el("div", { className: "bar" }, Object.assign(el("i"), { style: "width:" + pct + "%" })),
+    ),
+    el("div", { className: "purse", title: "Tu bolsa de oro" },
+      el("div", { className: "coin" }), el("b", { textContent: String(S.oro) }),
+    ),
+  );
+}
+
+function pintarTabs() {
+  const tabs = $("#tabs");
+  if (seccion !== "cantina") { tabs.replaceChildren(); tabs.hidden = true; return; }
+  tabs.hidden = false;
+  tabs.replaceChildren(...PESTANAS.map((p) => {
+    const b = el("button", { type: "button", textContent: p.label, role: "tab" });
+    b.setAttribute("aria-selected", String(pestana === p.id));
+    b.onclick = () => { pestana = p.id; pintar(); };
+    return b;
+  }));
+}
+
+function pintar() {
+  pintarRail();
+  pintarTop();
+  pintarTabs();
+
+  const view = $("#view");
+  let contenido;
+  if (seccion === "cantina") {
+    contenido = pestana === "mesa" ? vistaMesa() : pestana === "fama" ? vistaFama() : vistaMisiones();
+  } else if (seccion === "tienda")     contenido = vistaTienda();
+  else if (seccion === "inventario")   contenido = vistaInventario();
+  else                                 contenido = vistaAjustes();
+
+  view.replaceChildren(el("div", { className: "wrap" }, contenido));
+  view.scrollTop = 0;
+
+  $("#fab").hidden = !(seccion === "cantina" && pestana !== "fama");
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Arranque
+   ══════════════════════════════════════════════════════════════════════════ */
+
+$("#fab").onclick = dialogoCrear;
+
+function mostrarInfo() {
+  modal("Sobre esta demo", el("div", { style: "font-size:12px;line-height:1.55" },
+    el("p", { textContent: "TavernQuest era una app Android hecha en Flutter con Firebase. Se perdió el proyecto y sólo quedó el APK." }),
+    el("p", { textContent: "El build no estaba ofuscado, así que del binario se recuperaron la estructura, los nombres de clases y métodos, los textos y los assets. La lógica de cada método, en cambio, se compiló a código máquina y no se puede revertir.",
+              style: "margin-top:7px" }),
+    el("p", { textContent: "Esto es una reimplementación web de esa app a partir de lo recuperado: HTML, CSS y JS sin dependencias. Los assets y los textos son los originales; las fórmulas de recompensa están reconstruidas.",
+              style: "margin-top:7px" }),
+    el("p", { textContent: "Todo el estado vive en tu navegador. No hay backend.",
+              style: "margin-top:7px;color:var(--ink-dim)" }),
+  ));
+}
+
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarModal(); });
+
+revisarVencidos();
+pintar();
+
+/* Los contadores del original se refrescaban solos; acá basta con repintar la
+   vista de misiones de vez en cuando para que el tiempo restante no se congele. */
+setInterval(() => {
+  if (seccion === "cantina" && pestana === "misiones" && !$(".veil")) {
+    revisarVencidos();
+    pintar();
+  }
+}, 30000);
+</script>
+</body>
+</html>
