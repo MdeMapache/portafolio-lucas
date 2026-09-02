@@ -1,21 +1,108 @@
 @import "tailwindcss";
 @config "../../tailwind.config.ts";
 
+/*
+  El fondo lo pinta <BackgroundLayer/>, no el body. El body sólo lleva un color
+  base opaco para que nunca se vea el blanco del navegador detrás.
+
+  (Antes el gradiente vivía en `body`, que sólo mide lo que mide el contenido:
+  en viewports altos quedaba una franja negra bajo el footer.)
+*/
 body {
-  background: radial-gradient(ellipse at top, #22344a 0%, #1b2838 45%, #0e1621 100%);
-  background-attachment: fixed;
+  background-color: #0e1621;
   color: #c6d4df;
 }
 
-/* textura sutil de grilla, como el fondo de Steam */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
+/* Textura de grilla sutil, encima del fondo y debajo del contenido. */
+.bg-grid-overlay {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
   background-size: 38px 38px;
-  pointer-events: none;
-  z-index: 0;
+}
+
+/* ── Fondos de perfil ─────────────────────────────────────────────────────
+   Equivalente a los "Fondos Animados de Perfil" de Steam. Todo es CSS: pesan
+   cero y animan sin JavaScript. El catálogo vive en lib/portfolio/backgrounds.ts
+   y los ids de allá tienen que coincidir con estas clases.
+   ──────────────────────────────────────────────────────────────────────── */
+
+.bg-preset-steam {
+  background: radial-gradient(ellipse at top, #22344a 0%, #1b2838 45%, #0e1621 100%);
+}
+
+.bg-preset-data {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(64, 255, 128, 0.06) 0px,
+      rgba(64, 255, 128, 0.06) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    linear-gradient(135deg, #04170a 0%, #0b3d17 50%, #04170a 100%);
+  background-size: 100% 4px, 100% 100%;
+  animation: bg-scan 8s linear infinite;
+}
+
+.bg-preset-nebula {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(120, 60, 220, 0.35) 0%, transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(60, 120, 220, 0.3) 0%, transparent 45%),
+    linear-gradient(135deg, #1a1040 0%, #0e1621 70%);
+  background-size: 200% 200%, 200% 200%, 100% 100%;
+  animation: bg-drift 24s ease-in-out infinite alternate;
+}
+
+.bg-preset-synthwave {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 46, 136, 0.09) 0px,
+      rgba(255, 46, 136, 0.09) 1px,
+      transparent 1px,
+      transparent 44px
+    ),
+    linear-gradient(180deg, #2b1055 0%, #58206b 55%, #14071f 100%);
+  background-size: 44px 100%, 100% 100%;
+  animation: bg-slide 14s linear infinite;
+}
+
+.bg-preset-terminal {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 255, 120, 0.05) 0px,
+      rgba(0, 255, 120, 0.05) 2px,
+      transparent 2px,
+      transparent 5px
+    ),
+    linear-gradient(180deg, #001b0e 0%, #00120a 100%);
+  background-size: 100% 5px, 100% 100%;
+  animation: bg-scan 5s linear infinite;
+}
+
+@keyframes bg-scan {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 64px, 0 0; }
+}
+
+@keyframes bg-slide {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 44px 0, 0 0; }
+}
+
+@keyframes bg-drift {
+  from { background-position: 0% 0%, 100% 100%, 0 0; }
+  to   { background-position: 100% 100%, 0% 0%, 0 0; }
+}
+
+/* Quien pidió menos movimiento no debería tener un fondo animado detrás. */
+@media (prefers-reduced-motion: reduce) {
+  .bg-preset-data,
+  .bg-preset-nebula,
+  .bg-preset-synthwave,
+  .bg-preset-terminal {
+    animation: none;
+  }
 }

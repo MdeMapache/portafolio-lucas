@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Oswald, Inter, JetBrains_Mono } from "next/font/google";
+import { AuthProvider } from "@/components/AuthProvider";
+import BackgroundLayer from "@/components/BackgroundLayer";
+import { PortfolioProvider } from "@/components/PortfolioProvider";
 import "./globals.css";
 
 const oswald = Oswald({
@@ -31,9 +34,20 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${oswald.variable} ${inter.variable} ${jetbrains.variable} font-body`}
+        className={`${oswald.variable} ${inter.variable} ${jetbrains.variable} font-body min-h-screen`}
       >
-        {children}
+        {/*
+          AuthProvider va por fuera porque quién sos no depende del contenido,
+          pero el contenido sí depende de quién sos (qué controles se muestran).
+          BackgroundLayer va acá y no en la página para que el fondo no se
+          remonte al navegar.
+        */}
+        <AuthProvider>
+          <PortfolioProvider>
+            <BackgroundLayer />
+            {children}
+          </PortfolioProvider>
+        </AuthProvider>
       </body>
     </html>
   );
