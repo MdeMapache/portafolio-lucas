@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { playClick, playHover, setSfxMuted } from "@/lib/sfx";
 
 const ENABLED_KEY = "portafolio:audio";
 const VOLUME_KEY = "portafolio:audio:vol";
+const CHANNEL_NAME = "portafolio:audio";
 const DEFAULT_VOLUME = 0.35;
 
 /** Elementos que disparan sonido al pasar el cursor. */
@@ -14,8 +15,7 @@ const INTERACTIVE = "a, button, [data-sfx]";
  * Control de audio: música en bucle + efectos de interfaz.
  *
  * Va fijo arriba a la derecha, por encima del contenido pero por debajo de los
- * diálogos (z-40 contra el z-50 de los modales), para que abrir el panel de
- * edición no deje el control flotando encima.
+ * diálogos (z-40 contra el z-50 de los modales).
  *
  * Sobre el autoplay: los navegadores no dejan reproducir hasta que hay un gesto
  * del usuario. Se intenta al montar y, si lo rechazan, queda a la espera del
@@ -29,6 +29,60 @@ export default function AudioController() {
   const [enabled, setEnabled] = useState(true);
   const [volume, setVolume] = useState(DEFAULT_VOLUME);
   const [blocked, setBlocked] = useState(false);
+
+  // Identidad de esta pestaña y canal con las demás. El id se genera dentro de
+  // un efecto y no en el render: `Math.random()` en el cuerpo del componente es
+  // impuro y rompe el modelo de React.
+  const tabIdRef = useRef<string>("");
+  const channelRef = useRef<BroadcastChannel | null>(null);
+
+  /** Reproduce y avisa al resto de las pestañas para que se callen. */
+  const startPlayback = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio
+      .play()
+      .then(() => {
+        setBlocked(false);
+        channelRef.current?.postMessage({ type: "playing", id: tabIdRef.current });
+      })
+      .catch(() => {
+        // Autoplay rechazado: no es un error, es la política del navegador.
+        setBlocked(true);
+      });
+  }, []);
+
+  /**
+   * Una sola pestaña sonando a la vez.
+   *
+   * Va declarado ANTES que el efecto de reproducción para que el canal exista
+   * cuando ocurra el primer play; los efectos corren en orden de declaración.
+   *
+   * La Visibility API sola no alcanza: hay navegadores y contenedores que no
+   * marcan como ocultas las pestañas de segundo plano, y entonces dos copias
+   * del sitio reproducen la pista en posiciones distintas y se superponen.
+   */
+  useEffect(() => {
+    if (typeof BroadcastChannel === "undefined") return;
+
+    tabIdRef.current = Math.random().toString(36).slice(2);
+
+    const channel = new BroadcastChannel(CHANNEL_NAME);
+    channelRef.current = channel;
+
+    channel.onmessage = (event: MessageEvent) => {
+      const data = event.data as { type?: string; id?: string } | null;
+      if (data?.type === "playing" && data.id !== tabIdRef.current) {
+        audioRef.current?.pause();
+      }
+    };
+
+    return () => {
+      channel.close();
+      channelRef.current = null;
+    };
+  }, []);
 
   // Preferencias guardadas. Van en rAF y no directo en el efecto para no
   // disparar un setState síncrono, y arrancan en el mismo valor que el servidor
@@ -68,24 +122,19 @@ export default function AudioController() {
       return;
     }
 
-    audio
-      .play()
-      .then(() => setBlocked(false))
-      .catch(() => {
-        // Autoplay rechazado: no es un error, es la política del navegador.
-        setBlocked(true);
-      });
-  }, [enabled]);
+    // En una pestaña oculta no arrancamos: lo hará el listener de visibilidad
+    // cuando pase a primer plano.
+    if (document.hidden) return;
+
+    startPlayback();
+  }, [enabled, startPlayback]);
 
   // Si el autoplay quedó bloqueado, el primer gesto lo destraba.
   useEffect(() => {
     if (!blocked || !enabled) return;
 
     function unlock() {
-      audioRef.current
-        ?.play()
-        .then(() => setBlocked(false))
-        .catch(() => {});
+      startPlayback();
     }
 
     window.addEventListener("pointerdown", unlock, { once: true });
@@ -95,7 +144,26 @@ export default function AudioController() {
       window.removeEventListener("pointerdown", unlock);
       window.removeEventListener("keydown", unlock);
     };
-  }, [blocked, enabled]);
+  }, [blocked, enabled, startPlayback]);
+
+  // Sólo suena la pestaña que se está mirando. Complementa al canal de arriba:
+  // esto cubre la pestaña olvidada en segundo plano que seguiría haciendo ruido.
+  useEffect(() => {
+    function onVisibilityChange() {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      if (document.hidden) {
+        audio.pause();
+      } else if (enabled) {
+        // Al volver al frente, esta pestaña reclama el audio para sí.
+        startPlayback();
+      }
+    }
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [enabled, startPlayback]);
 
   // Efectos de interfaz, delegados en document.
   useEffect(() => {
