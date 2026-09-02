@@ -56,7 +56,9 @@ export default function SectionRouter() {
     <div className="relative z-[1] flex flex-col lg:flex-row min-h-screen">
       <Sidebar active={active} onSelect={select} />
 
-      <main className="flex-1 min-w-0 p-4 sm:p-7 lg:p-9">
+      {/* `pt-14` deja libre la franja donde flota el control de audio, para que
+          no se monte sobre la cabecera del panel. */}
+      <main className="flex-1 min-w-0 p-4 sm:p-7 lg:p-9 pt-14 sm:pt-14 lg:pt-14">
         <AnimatePresence mode="wait">
           <motion.section
             key={active}

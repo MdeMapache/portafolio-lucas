@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import AudioController from "@/components/AudioController";
 import { useAuth } from "@/components/AuthProvider";
 import { usePortfolio } from "@/components/PortfolioProvider";
 import SignInDialog from "@/components/SignInDialog";
@@ -79,13 +78,6 @@ export default function Sidebar({
               <span className="font-mono text-[10px] uppercase tracking-wider text-steam-dim">
                 {profile.availableForWork ? "disponible" : "no disponible"}
               </span>
-            </div>
-
-            {/* Va en el bloque de identidad y no en el pie porque el pie está
-                oculto abajo de lg, y el control de audio tiene que alcanzarse
-                siempre — sobre todo en móvil. */}
-            <div className="mt-3">
-              <AudioController />
             </div>
           </div>
         </div>

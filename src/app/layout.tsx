@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Oswald, Inter, JetBrains_Mono } from "next/font/google";
+import AudioController from "@/components/AudioController";
 import { AuthProvider } from "@/components/AuthProvider";
 import BackgroundLayer from "@/components/BackgroundLayer";
 import { PortfolioProvider } from "@/components/PortfolioProvider";
@@ -45,6 +46,9 @@ export default function RootLayout({
         <AuthProvider>
           <PortfolioProvider>
             <BackgroundLayer />
+            {/* Fuera de la página: el control es global y no debe remontarse
+                al cambiar de sección, o la música se cortaría en cada clic. */}
+            <AudioController />
             {children}
           </PortfolioProvider>
         </AuthProvider>
