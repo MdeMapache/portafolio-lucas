@@ -4,7 +4,12 @@ import { useRef, useState } from "react";
 import AssetImage from "@/components/ui/AssetImage";
 import { usePortfolio } from "@/components/PortfolioProvider";
 import type { Project } from "@/lib/portfolio/types";
-import { Button, Field, LevelSlider, TextArea, TextInput } from "./fields";
+import { Button, EditRow, Field, LevelSlider, TextArea, TextInput } from "./fields";
+
+/** Id corto para una fila nueva de control o truco. */
+function newId(prefix: string) {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`;
+}
 
 function newProject(): Project {
   return {
@@ -20,6 +25,8 @@ function newProject(): Project {
     repoUrl: null,
     tech: [],
     screenshotAssetIds: [],
+    controls: [],
+    cheats: [],
     featured: false,
   };
 }
@@ -259,6 +266,121 @@ export default function ProjectsTab() {
                     </Button>
                   </div>
                 </Field>
+
+                {/* Controles y trucos: sólo tienen sentido si hay un demo que
+                    jugar, así que no ocupan espacio en un proyecto sin URL. */}
+                {project.demoUrl ? (
+                  <>
+                    <Field label="Controles" hint="Aparecen junto al juego cuando alguien lo abre.">
+                      <div>
+                        {project.controls.map((control) => (
+                          <EditRow
+                            key={control.id}
+                            onRemove={() =>
+                              patchProject(project.id, {
+                                controls: project.controls.filter((c) => c.id !== control.id),
+                              })
+                            }
+                          >
+                            <div className="flex gap-2">
+                              <TextInput
+                                value={control.key}
+                                onChange={(e) =>
+                                  patchProject(project.id, {
+                                    controls: project.controls.map((c) =>
+                                      c.id === control.id ? { ...c, key: e.target.value } : c,
+                                    ),
+                                  })
+                                }
+                                placeholder="W / A / S / D"
+                                className="w-32 text-center"
+                                aria-label="Tecla"
+                              />
+                              <TextInput
+                                value={control.action}
+                                onChange={(e) =>
+                                  patchProject(project.id, {
+                                    controls: project.controls.map((c) =>
+                                      c.id === control.id ? { ...c, action: e.target.value } : c,
+                                    ),
+                                  })
+                                }
+                                placeholder="Qué hace"
+                                aria-label="Acción"
+                              />
+                            </div>
+                          </EditRow>
+                        ))}
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            patchProject(project.id, {
+                              controls: [
+                                ...project.controls,
+                                { id: newId("ctl"), key: "", action: "" },
+                              ],
+                            })
+                          }
+                        >
+                          + Agregar control
+                        </Button>
+                      </div>
+                    </Field>
+
+                    <Field label="Trucos" hint="Se muestran plegados: quien no quiera spoilers no los ve.">
+                      <div>
+                        {project.cheats.map((cheat) => (
+                          <EditRow
+                            key={cheat.id}
+                            onRemove={() =>
+                              patchProject(project.id, {
+                                cheats: project.cheats.filter((c) => c.id !== cheat.id),
+                              })
+                            }
+                          >
+                            <div className="flex gap-2">
+                              <TextInput
+                                value={cheat.code}
+                                onChange={(e) =>
+                                  patchProject(project.id, {
+                                    cheats: project.cheats.map((c) =>
+                                      c.id === cheat.id ? { ...c, code: e.target.value } : c,
+                                    ),
+                                  })
+                                }
+                                placeholder="Código"
+                                className="w-40 font-mono"
+                                aria-label="Código"
+                              />
+                              <TextInput
+                                value={cheat.effect}
+                                onChange={(e) =>
+                                  patchProject(project.id, {
+                                    cheats: project.cheats.map((c) =>
+                                      c.id === cheat.id ? { ...c, effect: e.target.value } : c,
+                                    ),
+                                  })
+                                }
+                                placeholder="Efecto"
+                                aria-label="Efecto"
+                              />
+                            </div>
+                          </EditRow>
+                        ))}
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            patchProject(project.id, {
+                              cheats: [...project.cheats, { id: newId("cht"), code: "", effect: "" }],
+                            })
+                          }
+                        >
+                          + Agregar truco
+                        </Button>
+                      </div>
+                    </Field>
+                  </>
+                ) : null}
 
                 {!project.featured ? (
                   <Button type="button" variant="primary" onClick={() => setFeatured(project.id)}>

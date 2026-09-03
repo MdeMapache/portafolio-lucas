@@ -1,7 +1,8 @@
 import { cloneDefaults } from "./defaults";
 import { IdbAssetStore } from "./assetStore.idb";
+import { migrate } from "./migrate";
 import type { PortfolioRepository } from "./repository";
-import { SCHEMA_VERSION, type PortfolioData } from "./types";
+import type { PortfolioData } from "./types";
 
 const STORAGE_KEY = "portafolio:data";
 
@@ -53,32 +54,4 @@ export class LocalRepository implements PortfolioRepository {
     await this.assets.clear();
   }
 }
-
-/**
- * Rellena campos faltantes con los defaults.
- *
- * Sirve para dos cosas: leer documentos guardados por una versión vieja del
- * esquema, y tolerar un JSON al que le falten claves. Preferimos completar
- * antes que descartar: perder los datos del usuario es peor que un campo nuevo
- * en su valor por defecto.
- */
-function migrate(saved: Partial<PortfolioData>): PortfolioData {
-  const defaults = cloneDefaults();
-
-  return {
-    version: SCHEMA_VERSION,
-    profile: { ...defaults.profile, ...saved.profile },
-    background: saved.background ?? defaults.background,
-    cvAssetId: saved.cvAssetId ?? defaults.cvAssetId,
-    projects: saved.projects ?? defaults.projects,
-    experience: saved.experience ?? defaults.experience,
-    education: saved.education ?? defaults.education,
-    languages: saved.languages ?? defaults.languages,
-    skills: saved.skills ?? defaults.skills,
-    techBadges: saved.techBadges ?? defaults.techBadges,
-    groups: saved.groups ?? defaults.groups,
-    contacts: saved.contacts ?? defaults.contacts,
-    certifications: saved.certifications ?? defaults.certifications,
-    stats: saved.stats ?? defaults.stats,
-  };
-}
+

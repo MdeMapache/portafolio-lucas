@@ -41,6 +41,8 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
       repoUrl: null,
       tech: ["Godot", "GDScript", "Android"],
       screenshotAssetIds: [],
+      controls: [],
+      cheats: [],
       featured: true,
     },
     {
@@ -57,6 +59,8 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
       repoUrl: null,
       tech: ["Flutter", "Dart", "Firebase"],
       screenshotAssetIds: [],
+      controls: [],
+      cheats: [],
       featured: false,
     },
     {
@@ -73,6 +77,8 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
       repoUrl: null,
       tech: ["Angular", "Ionic", "TypeScript"],
       screenshotAssetIds: [],
+      controls: [],
+      cheats: [],
       featured: false,
     },
     {
@@ -89,6 +95,8 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
       repoUrl: null,
       tech: ["Next.js", "TypeScript", "Tailwind"],
       screenshotAssetIds: [],
+      controls: [],
+      cheats: [],
       featured: false,
     },
   ],

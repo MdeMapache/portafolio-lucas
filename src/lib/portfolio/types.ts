@@ -35,6 +35,12 @@ export type BackgroundChoice =
   | { kind: "preset"; presetId: string }
   | { kind: "custom"; assetId: AssetId };
 
+/** Una fila de la tabla de controles de un demo. */
+export type DemoControl = { id: string; key: string; action: string };
+
+/** Un truco o código del juego. */
+export type DemoCheat = { id: string; code: string; effect: string };
+
 export type Project = {
   id: string;
   icon: string;
@@ -50,6 +56,10 @@ export type Project = {
   repoUrl: string | null;
   tech: string[];
   screenshotAssetIds: AssetId[];
+  /** Controles del demo, para la ficha que acompaña al juego embebido. */
+  controls: DemoControl[];
+  /** Trucos y códigos. Van aparte de los controles porque se muestran plegados. */
+  cheats: DemoCheat[];
   /** Sólo uno queda destacado; el repositorio se encarga de mantener la unicidad. */
   featured: boolean;
 };

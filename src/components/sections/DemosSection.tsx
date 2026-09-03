@@ -1,161 +1,96 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { usePortfolio } from "@/components/PortfolioProvider";
 import BlockDivider from "@/components/ui/BlockDivider";
+import SpecGrid from "@/components/ui/SpecGrid";
 import UnitCard from "@/components/ui/UnitCard";
 import { ACCENT_HAZARD, ACCENT_PHOSPHOR, ACCENT_STEEL } from "@/components/ui/accents";
-import { duckAudio } from "@/lib/audioBus";
 import type { Project } from "@/lib/portfolio/types";
-
-/** Si en este tiempo no cargó, casi seguro el sitio bloquea el embebido. */
-const LOAD_TIMEOUT_MS = 6000;
+import DemoCockpit from "./DemoCockpit";
 
 /**
  * Demos en vivo.
  *
  * Los demos no son un modelo aparte: cualquier proyecto con `demoUrl` aparece
- * acá embebido. Así se editan desde el mismo lugar que todo lo demás
- * (Modificar perfil → Proyectos) y no hay dos listas que mantener.
+ * acá. Así se editan desde el mismo lugar que todo lo demás (Modificar perfil →
+ * Proyectos) y no hay dos listas que mantener.
  *
- * Sirve tanto para una URL externa como para un build autohospedado en
- * `public/demos/` — ver el README de esa carpeta.
+ * La tarjeta ya no embebe el juego: es la ficha de la unidad, y el juego se
+ * abre en una cabina a pantalla completa. Un export de Godot no se juega cómodo
+ * en un recuadro de 300 px, y cargarlo al abrir la pestaña sería descargar
+ * decenas de MB a alguien que quizá sólo vino a mirar.
  */
-function DemoFrame({ project }: { project: Project }) {
-  const [loaded, setLoaded] = useState(false);
-  const [timedOut, setTimedOut] = useState(false);
+function DemoEntry({ project }: { project: Project }) {
   const [running, setRunning] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const frameRef = useRef<HTMLIFrameElement>(null);
-
-  // Si no cargó a tiempo, avisamos en vez de dejar un recuadro negro mudo.
-  useEffect(() => {
-    if (!running || loaded) return;
-    const timer = window.setTimeout(() => setTimedOut(true), LOAD_TIMEOUT_MS);
-    return () => window.clearTimeout(timer);
-  }, [running, loaded]);
-
-  // Mientras corre un demo, la música del sitio se calla: un juego con su
-  // propio audio compitiendo con la banda sonora es insoportable.
-  useEffect(() => {
-    duckAudio(running);
-    return () => duckAudio(false);
-  }, [running]);
 
   if (!project.demoUrl) return null;
 
   const selfHosted = project.demoUrl.startsWith("/");
-
-  // El color comunica estado: amarillo mientras corre, y en reposo distingue
-  // un build propio (fósforo) de uno alojado afuera (acero).
-  const accent = running ? ACCENT_HAZARD : selfHosted ? ACCENT_PHOSPHOR : ACCENT_STEEL;
-  const status = running ? (loaded ? "en marcha" : "cargando…") : "en espera";
+  const accent = selfHosted ? ACCENT_PHOSPHOR : ACCENT_STEEL;
 
   return (
-    <UnitCard
-      code={selfHosted ? "LOC" : "EXT"}
-      title={project.title}
-      accent={accent}
-      canvas="radar"
-      aside={status}
-    >
-      {/* Barra de control. Va dentro del cuerpo y no en la cabecera porque el
-          borde superior ya lo ocupan el título y el código de la unidad. */}
-      <div className="flex items-center gap-2.5 mb-2.5">
-        <span className="text-base shrink-0">{project.icon}</span>
-        <p className="font-mono text-[10px] text-steam-dim/70 leading-snug flex-1 min-w-0">
-          {project.description}
-        </p>
+    <>
+      <UnitCard
+        code={selfHosted ? "LOC" : "EXT"}
+        title={project.title}
+        accent={running ? ACCENT_HAZARD : accent}
+        canvas="radar"
+        aside={running ? "en simulación" : "en espera"}
+      >
+        <div className="flex items-start gap-3">
+          <div className="hud-clip-sm shadow-plate w-11 h-11 shrink-0 flex items-center justify-center border border-current/30 bg-mw-fieldDeep text-xl">
+            {project.icon}
+          </div>
+          <p className="flex-1 min-w-0 font-mono text-[10px] text-steam-text/80 leading-relaxed">
+            {project.description}
+          </p>
+        </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
-          {running ? (
-            <>
-              <button
-                type="button"
-                onClick={() => frameRef.current?.requestFullscreen?.()}
-                title="Pantalla completa"
-                className="font-mono text-[11px] text-steam-dim hover:text-current transition-colors"
-              >
-                ⛶
-              </button>
-              <button
-                type="button"
-                onClick={() => setExpanded((v) => !v)}
-                title={expanded ? "Reducir" : "Agrandar"}
-                className="font-mono text-[10px] text-steam-dim hover:text-current transition-colors"
-              >
-                {expanded ? "[ − ]" : "[ + ]"}
-              </button>
-            </>
-          ) : null}
+        <SpecGrid
+          className="mt-3"
+          items={[
+            { label: "origen", value: selfHosted ? "LOCAL" : "EXTERNO" },
+            {
+              label: "controles",
+              value: project.controls.length
+                ? String(project.controls.length).padStart(2, "0")
+                : "—",
+            },
+            {
+              label: "trucos",
+              value: project.cheats.length ? String(project.cheats.length).padStart(2, "0") : "—",
+            },
+          ]}
+        />
+
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setRunning(true)}
+            className="hud-clip-sm shadow-plate flex items-center gap-2 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] border border-mw-hazard/60 bg-mw-hazard/12 text-mw-hazard hover:bg-mw-hazard/25 hover:shadow-glow-hazard transition-all hover:-translate-y-px"
+          >
+            <span aria-hidden>▶</span> iniciar simulación
+          </button>
+
           <a
             href={project.demoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-[10px] text-current hover:text-mw-rust transition-colors"
+            className="hud-clip-sm shadow-plate px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] border border-mw-steel/40 bg-steam-panel2/50 text-steam-dim hover:border-mw-steel hover:text-mw-steelLight transition-all"
           >
-            ABRIR ↗
+            pestaña propia ↗
           </a>
         </div>
-      </div>
 
-      <div
-        className={`relative bg-black border border-current/25 transition-[height] ${
-          expanded ? "h-[75vh]" : "h-[300px]"
-        }`}
-      >
-        {!running ? (
-          /*
-            El demo no arranca solo: un export de Godot pesa decenas de MB y
-            cargar todos los demos de la página a la vez sería brutal para quien
-            entra sólo a mirar. Se carga cuando lo piden.
-          */
-          <button
-            type="button"
-            onClick={() => setRunning(true)}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-2 group/play"
-          >
-            <span className="font-mono text-3xl text-current transition-transform group-hover/play:scale-110">
-              ▶
-            </span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-steam-dim">
-              iniciar demo
-            </span>
-            <span className="font-mono text-[9px] text-steam-dim/50">puede pesar varios MB</span>
-          </button>
-        ) : (
-          <>
-            {!loaded ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
-                <span className="font-mono text-[11px] text-current animate-pulse">CARGANDO…</span>
-                {timedOut ? (
-                  <span className="font-mono text-[9.5px] text-mw-rust max-w-[80%] text-center leading-relaxed">
-                    Tarda de más. Puede que el sitio bloquee el embebido — probá con ABRIR ↗
-                  </span>
-                ) : null}
-              </div>
-            ) : null}
+        {/* Es honesto avisarlo: un export de Godot ronda los 50 MB. */}
+        <p className="font-mono text-[9px] text-steam-dim/50 mt-2">
+          el paquete se descarga al iniciar
+        </p>
+      </UnitCard>
 
-            {/*
-              `sandbox` limita lo que el contenido embebido puede hacer.
-              `allow` habilita lo que un juego necesita: pantalla completa,
-              gamepad, y el aislamiento de origen para los builds con hilos.
-            */}
-            <iframe
-              ref={frameRef}
-              src={project.demoUrl}
-              title={`Demo de ${project.title}`}
-              onLoad={() => setLoaded(true)}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock"
-              allow="fullscreen; gamepad; autoplay; cross-origin-isolated"
-              allowFullScreen
-              referrerPolicy="no-referrer"
-              className="w-full h-full border-0"
-            />
-          </>
-        )}
-      </div>
-    </UnitCard>
+      {running ? <DemoCockpit project={project} onClose={() => setRunning(false)} /> : null}
+    </>
   );
 }
 
@@ -171,20 +106,20 @@ export default function DemosSection() {
       />
 
       {withDemo.length === 0 ? (
-        <div className="mw-frame text-mw-phosphor/50 border border-dashed border-mw-phosphor/25 p-8 text-center">
+        <div className="mw-frame text-mw-steel/50 border border-dashed border-mw-steel/30 p-8 text-center">
           <p className="font-mono text-[11px] text-steam-dim">Sin demos publicados todavía.</p>
           <p className="font-mono text-[10px] text-steam-dim/60 mt-2 leading-relaxed">
             Cargá la URL en Modificar perfil → Proyectos → Demo en vivo.
             <br />
-            Para un build propio en <code className="text-mw-phosphor">public/demos/</code>, usá una
-            ruta como <code className="text-mw-phosphor">/demos/mi-juego/index.html</code>.
+            Para un build propio en <code className="text-mw-hazard">public/demos/</code>, usá una
+            ruta como <code className="text-mw-hazard">/demos/mi-juego/index.html</code>.
           </p>
         </div>
       ) : (
         // `gap-6`: los rótulos van montados fuera del borde de cada tarjeta.
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {withDemo.map((project) => (
-            <DemoFrame key={project.id} project={project} />
+            <DemoEntry key={project.id} project={project} />
           ))}
         </div>
       )}

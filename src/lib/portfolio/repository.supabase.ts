@@ -1,7 +1,8 @@
 import { getSupabase } from "@/lib/supabase";
 import { cloneDefaults } from "./defaults";
+import { migrate } from "./migrate";
 import type { PortfolioRepository } from "./repository";
-import { SCHEMA_VERSION, type PortfolioData } from "./types";
+import type { PortfolioData } from "./types";
 
 /** Fila única de la tabla `portfolio`. Ver `supabase-setup.sql`. */
 const ROW_ID = 1;
@@ -62,25 +63,4 @@ export class SupabaseRepository implements PortfolioRepository {
     await this.save(cloneDefaults());
   }
 }
-
-/** Igual que en el adapter local: completar antes que descartar. */
-function migrate(saved: Partial<PortfolioData>): PortfolioData {
-  const defaults = cloneDefaults();
-
-  return {
-    version: SCHEMA_VERSION,
-    profile: { ...defaults.profile, ...saved.profile },
-    background: saved.background ?? defaults.background,
-    cvAssetId: saved.cvAssetId ?? defaults.cvAssetId,
-    projects: saved.projects ?? defaults.projects,
-    experience: saved.experience ?? defaults.experience,
-    education: saved.education ?? defaults.education,
-    languages: saved.languages ?? defaults.languages,
-    skills: saved.skills ?? defaults.skills,
-    techBadges: saved.techBadges ?? defaults.techBadges,
-    groups: saved.groups ?? defaults.groups,
-    contacts: saved.contacts ?? defaults.contacts,
-    certifications: saved.certifications ?? defaults.certifications,
-    stats: saved.stats ?? defaults.stats,
-  };
-}
+
