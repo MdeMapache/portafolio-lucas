@@ -590,3 +590,67 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .bg-preset-hangar { animation: none; }
 }
+
+/* ── Chapa de cabina ──────────────────────────────────────────────────────
+   Formas recortadas para que los paneles dejen de ser rectángulos con borde.
+   El borde se consigue apilando dos capas recortadas: la de atrás pinta el
+   color del borde, la de adelante el relleno, un píxel más adentro. No se
+   puede usar `border` porque clip-path lo recorta junto con el resto.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Esquinas cortadas en diagonal, las cuatro. */
+.hud-clip {
+  clip-path: polygon(
+    18px 0, calc(100% - 18px) 0,
+    100% 18px, 100% calc(100% - 18px),
+    calc(100% - 18px) 100%, 18px 100%,
+    0 calc(100% - 18px), 0 18px
+  );
+}
+
+/* Variante chica, para bloques internos. */
+.hud-clip-sm {
+  clip-path: polygon(
+    9px 0, calc(100% - 9px) 0,
+    100% 9px, 100% calc(100% - 9px),
+    calc(100% - 9px) 100%, 9px 100%,
+    0 calc(100% - 9px), 0 9px
+  );
+}
+
+/* Pestaña de cabecera: recta a la izquierda, biselada a la derecha. */
+.hud-tab {
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 100%, 0 100%);
+}
+
+/* Remache: cuadradito con brillo, para las esquinas de la chapa. */
+.hud-rivet {
+  box-shadow: inset 0 0 0 1px currentColor, 0 0 5px currentColor;
+}
+
+/* Segmentos del indicador de estado: barras que se encienden en cascada. */
+.hud-segment {
+  animation: hud-segment 2.4s ease-in-out infinite;
+}
+
+@keyframes hud-segment {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 1; }
+}
+
+/* Cursor de transmisión. */
+.hud-caret {
+  animation: hud-caret 1.1s steps(1, end) infinite;
+}
+
+@keyframes hud-caret {
+  0%, 49%  { opacity: 1; }
+  50%, 99% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-segment,
+  .hud-caret {
+    animation: none;
+  }
+}

@@ -3,6 +3,8 @@
 import CvHologram from "@/components/CvHologram";
 import { usePortfolio, useAssetUrl } from "@/components/PortfolioProvider";
 import UnitCard from "@/components/ui/UnitCard";
+import BlockDivider from "@/components/ui/BlockDivider";
+import Transmission from "@/components/ui/Transmission";
 import { canvasModeFor } from "@/components/ui/UnitCanvas";
 import { accentFor } from "@/components/ui/accents";
 
@@ -58,15 +60,13 @@ export default function ProfileSection() {
   return (
     <div>
       {/* Bio ------------------------------------------------------------- */}
-      <p className="text-[13.5px] leading-relaxed text-steam-text/90 max-w-3xl mb-5">
-        {profile.bio}
-      </p>
+      <Transmission label="perfil // origen">{profile.bio}</Transmission>
 
       <div className="flex flex-wrap gap-2 mb-7">
         {profile.tags.map((tag, i) => (
           <span
             key={`${tag}-${i}`}
-            className="font-mono text-[10px] px-2.5 py-1 border border-mw-phosphor/30 text-steam-dim tracking-wider transition-all hover:border-mw-phosphor hover:text-mw-phosphor hover:shadow-glow-phosphor"
+            className="hud-clip-sm font-mono text-[10px] px-2.5 py-1 bg-mw-field/30 border border-mw-phosphor/30 text-steam-dim tracking-wider transition-all hover:border-mw-phosphor hover:text-mw-phosphor hover:bg-mw-field/60 hover:shadow-glow-phosphor"
           >
             {tag}
           </span>
@@ -74,9 +74,7 @@ export default function ProfileSection() {
       </div>
 
       {/* Dossier --------------------------------------------------------- */}
-      <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-mw-phosphor/70 mb-3">
-        {"// dossier técnico"}
-      </h3>
+      <BlockDivider label="dossier técnico" count={`0${DOSSIER.length} módulos`} />
 
       {/* `gap-6` y no menos: los rótulos van montados fuera del borde (título
           arriba, grado abajo), así que con poca separación los de dos tarjetas

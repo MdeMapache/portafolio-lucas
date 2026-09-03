@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BlockDivider from "./ui/BlockDivider";
 import CvProjection from "./CvProjection";
 
 /**
  * Proyector holográfico del CV.
  *
- * Muestra el PDF como si fuera una proyección: el documento se tiñe de cian, se
+ * Muestra el PDF como si fuera una proyección: el documento se tiñe de verde, se
  * apoya sobre un emisor encendido del que sale un cono de luz, y lo cruzan
  * líneas de barrido y una banda de refresco.
  *
@@ -76,12 +77,7 @@ export default function CvHologram({ url }: { url: string | null }) {
 
   return (
     <section aria-labelledby="cv-holo-title">
-      <h3
-        id="cv-holo-title"
-        className="font-mono text-[10px] uppercase tracking-[0.25em] text-mw-phosphor/70 mb-3"
-      >
-        {"// documento adjunto"}
-      </h3>
+      <BlockDivider id="cv-holo-title" label="documento adjunto" />
 
       {/* Lectura de estado, al estilo de una consola. */}
       <div className="flex items-center gap-2 mb-2 font-mono text-[9.5px] uppercase tracking-widest">

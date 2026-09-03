@@ -8,6 +8,7 @@ import ProfileSection from "@/components/sections/ProfileSection";
 import ProjectsSection from "@/components/sections/ProjectsSection";
 import SkillsSection from "@/components/sections/SkillsSection";
 import TrayectoriaSection from "@/components/sections/TrayectoriaSection";
+import HudPanel from "@/components/ui/HudPanel";
 import Sidebar from "./Sidebar";
 import { DEFAULT_SECTION, SECTIONS, isSectionId, type SectionId } from "./sections";
 
@@ -62,35 +63,34 @@ export default function SectionRouter() {
           no se monte sobre la cabecera del panel. */}
       <main className="flex-1 min-w-0 p-4 sm:p-7 lg:p-9 pt-14 sm:pt-14 lg:pt-14">
         <AnimatePresence mode="wait">
-          <motion.section
+          <motion.div
             key={active}
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 8 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.99, y: -4 }}
-            transition={{ duration: reduceMotion ? 0.15 : 0.28, ease: [0.16, 1, 0.3, 1] }}
-            // La opacidad alta no es negociable: con un GIF de alto contraste
-            // detrás, el blur solo no alcanza y el texto se vuelve ilegible.
-            // Lo holográfico lo dan el borde neón, el blur y la animación.
-            className="holo-edge relative overflow-hidden bg-mw-void/88 backdrop-blur-xl border border-mw-phosphor/25 p-4 sm:p-6"
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.995, y: -6 }}
+            transition={{ duration: reduceMotion ? 0.15 : 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Cabecera del panel: número y nombre de la sección. */}
-            <header className="flex items-baseline gap-3 pb-3 mb-5 border-b border-mw-phosphor/20">
-              <span className="font-mono text-[11px] text-mw-phosphor">{meta?.code}</span>
-              <h2
-                data-text={meta?.label}
-                className="glitch font-display text-lg uppercase tracking-[0.2em] text-steam-bright"
+            <HudPanel code={meta?.code ?? ""} title={meta?.label ?? ""} hint={meta?.hint}>
+              {/*
+                El contenido entra un instante después del marco, no junto con
+                él: primero se "enciende" la chapa y recién ahí aparece lo que
+                muestra. Encimar las dos cosas hace que la transición se lea
+                como un simple fundido.
+              */}
+              <motion.div
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: reduceMotion ? 0.15 : 0.35,
+                  delay: reduceMotion ? 0 : 0.14,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className={reduceMotion ? undefined : "holo-flicker"}
               >
-                {meta?.label}
-              </h2>
-              <span className="ml-auto font-mono text-[10px] text-steam-dim/60 hidden sm:inline">
-                {meta?.hint}
-              </span>
-            </header>
-
-            <div className={reduceMotion ? undefined : "holo-flicker"}>
-              <Panel />
-            </div>
-          </motion.section>
+                <Panel />
+              </motion.div>
+            </HudPanel>
+          </motion.div>
         </AnimatePresence>
       </main>
     </div>

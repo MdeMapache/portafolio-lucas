@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePortfolio } from "@/components/PortfolioProvider";
+import BlockDivider from "@/components/ui/BlockDivider";
 import UnitCard from "@/components/ui/UnitCard";
 import { ACCENT_HAZARD, ACCENT_PHOSPHOR, ACCENT_STEEL } from "@/components/ui/accents";
 import { duckAudio } from "@/lib/audioBus";
@@ -168,6 +169,11 @@ export default function DemosSection() {
         Aplicaciones corriendo en vivo. Se cargan al pedirlas, no al abrir la pestaña. Mientras un
         demo está en marcha la música del sitio se silencia.
       </p>
+
+      <BlockDivider
+        label="unidades desplegables"
+        count={`${String(withDemo.length).padStart(2, "0")} en línea`}
+      />
 
       {withDemo.length === 0 ? (
         <div className="mw-frame text-mw-phosphor/50 border border-dashed border-mw-phosphor/25 p-8 text-center">

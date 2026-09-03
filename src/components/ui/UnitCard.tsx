@@ -82,14 +82,16 @@ export default function UnitCard({
           >
             ◄
           </span>
-          <h3
+          {/* h4 y no h3: cuelga del divisor de bloque, que ya es h3, que a
+              su vez cuelga del h2 del panel de sección. */}
+          <h4
             data-text={title}
             className={`glitch font-display uppercase tracking-[0.16em] text-steam-bright leading-none ${
               large ? "text-[15px]" : "text-[12.5px]"
             }`}
           >
             {title}
-          </h3>
+          </h4>
           <span
             aria-hidden
             className="font-mono text-[9px] leading-none transition-transform group-hover:translate-x-0.5"

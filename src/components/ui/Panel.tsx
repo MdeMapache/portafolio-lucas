@@ -25,12 +25,15 @@ export default function Panel({
     <section id={id} className={`mb-7 ${className}`}>
       <header className="flex items-baseline gap-2 mb-3 pb-1.5 border-b border-mw-phosphor/15">
         <span className="font-mono text-[10px] text-mw-phosphor/50">{"//"}</span>
-        <h2
+        {/* h3: es un bloque DENTRO de una sección, cuyo título ya es el h2
+            del panel de cabina. Con h2 acá la jerarquía quedaba plana y las
+            tarjetas (h4) saltaban un nivel. */}
+        <h3
           data-text={title}
           className="glitch font-mono text-[10px] uppercase tracking-[0.25em] text-mw-phosphor/80"
         >
           {title}
-        </h2>
+        </h3>
         {aside ? (
           <div className="ml-auto flex items-center gap-3 font-mono text-[10px]">{aside}</div>
         ) : null}

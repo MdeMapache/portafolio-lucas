@@ -2,6 +2,7 @@
 
 import { usePortfolio } from "@/components/PortfolioProvider";
 import UnitCard from "@/components/ui/UnitCard";
+import BlockDivider from "@/components/ui/BlockDivider";
 import { canvasModeFor } from "@/components/ui/UnitCanvas";
 import { ACCENT_HAZARD, ACCENT_PHOSPHOR, ACCENT_STEEL } from "@/components/ui/accents";
 import type { Education, Experience } from "@/lib/portfolio/types";
@@ -100,14 +101,9 @@ function EducationRow({ item, index }: { item: Education; index: number }) {
   );
 }
 
-/** Encabezado de bloque, con el prefijo `//` del resto del sitio. */
+/** Encabezado de bloque. Delega en el divisor compartido del sitio. */
 function BlockTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-mw-phosphor/70 mb-3">
-      {"// "}
-      {children}
-    </h3>
-  );
+  return <BlockDivider label={String(children)} />;
 }
 
 export default function TrayectoriaSection() {
