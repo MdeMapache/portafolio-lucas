@@ -18,19 +18,26 @@ export default function UnitCard({
   title,
   accent,
   aside,
+  size = "sm",
+  className = "",
   children,
 }: {
   /** Identificador corto, tipo `SEC`. Se muestra como `[SEC]`. */
   code: string;
   title: string;
   accent: Accent;
-  /** Contenido extra en la esquina inferior derecha. */
+  /** Contenido extra montado en el borde inferior derecho. */
   aside?: React.ReactNode;
+  /** `lg` para la unidad destacada; el marco es el mismo, cambia la escala. */
+  size?: "sm" | "lg";
+  className?: string;
   children: React.ReactNode;
 }) {
+  const large = size === "lg";
+
   return (
     <article
-      className={`group relative border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/90 transition-all duration-200 hover:-translate-y-0.5`}
+      className={`group relative border ${large ? "border-2" : ""} ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/90 transition-all duration-200 hover:-translate-y-0.5 ${className}`}
     >
       <span className="scan-sweep" />
       {/* Escuadras dobles, dentro del borde. */}
@@ -44,7 +51,9 @@ export default function UnitCard({
           </span>
           <h3
             data-text={title}
-            className="glitch font-display text-[12.5px] uppercase tracking-[0.16em] text-steam-bright leading-none"
+            className={`glitch font-display uppercase tracking-[0.16em] text-steam-bright leading-none ${
+              large ? "text-[15px]" : "text-[12.5px]"
+            }`}
           >
             {title}
           </h3>
@@ -58,7 +67,7 @@ export default function UnitCard({
         </span>
       </div>
 
-      <div className="px-4 pt-6 pb-4">{children}</div>
+      <div className={large ? "px-5 pt-7 pb-5" : "px-4 pt-6 pb-4"}>{children}</div>
 
       {aside ? (
         <div className="absolute -bottom-[7px] right-4 bg-cyber-void px-1.5 font-mono text-[8.5px] uppercase tracking-widest leading-none">

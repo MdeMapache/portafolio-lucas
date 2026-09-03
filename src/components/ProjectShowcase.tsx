@@ -6,8 +6,20 @@ import { usePortfolio } from "@/components/PortfolioProvider";
 import AssetImage from "@/components/ui/AssetImage";
 import Panel from "@/components/ui/Panel";
 import ProgressBar from "@/components/ui/ProgressBar";
+import UnitCard from "@/components/ui/UnitCard";
 import { accentFor } from "@/components/ui/accents";
 import type { Project } from "@/lib/portfolio/types";
+
+/** Porcentaje de avance, tolerando un total en cero. */
+function progressOf(project: Project) {
+  return project.total > 0 ? Math.round((project.done / project.total) * 100) : 0;
+}
+
+/** Rótulo de estado para el borde inferior de la tarjeta. */
+function gradeOf(project: Project) {
+  const pct = progressOf(project);
+  return pct === 100 ? "completo" : `avance ${String(pct).padStart(3, "0")}%`;
+}
 
 /** Enlace de acción con borde neón y flecha de salida. */
 function ActionLink({
@@ -71,31 +83,54 @@ function Screenshots({ ids }: { ids: string[] }) {
   );
 }
 
-/** Tarjeta grande del proyecto destacado. */
-function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean }) {
-  const pct = project.total > 0 ? Math.round((project.done / project.total) * 100) : 0;
+/** Barra de avance con el conteo de tareas a los costados. */
+function ProgressRow({ project }: { project: Project }) {
+  const pct = progressOf(project);
+  const complete = pct === 100;
 
   return (
-    <article className="group relative corner-frame border border-cyber-cyan/50 text-cyber-cyan bg-cyber-void/50 p-5 mb-3 transition-all duration-200 hover:shadow-neon-cyan">
-      <span className="scan-sweep" />
+    <div className="flex items-center gap-2.5 mt-4">
+      <span className="font-mono text-[9.5px] text-steam-dim whitespace-nowrap">
+        {String(project.done).padStart(2, "0")}/{String(project.total).padStart(2, "0")}
+      </span>
+      <div className="flex-1">
+        <ProgressBar
+          value={pct}
+          className={
+            complete
+              ? "bg-cyber-lime text-cyber-lime bar-glow"
+              : "bg-cyber-cyan text-cyber-cyan bar-glow"
+          }
+          trackClassName="rounded-none bg-cyber-void/70 border border-cyber-cyan/15"
+        />
+      </div>
+      <span
+        className={`font-mono text-[9.5px] w-14 text-right ${
+          complete ? "text-cyber-lime" : "text-steam-dim"
+        }`}
+      >
+        {complete ? "COMPLETO" : `${String(pct).padStart(3, "0")}%`}
+      </span>
+    </div>
+  );
+}
 
+/** Unidad destacada: mismo marco que el resto, mayor escala. */
+function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean }) {
+  return (
+    <UnitCard
+      code="TOP"
+      title={project.title}
+      accent={accentFor(1)}
+      size="lg"
+      aside={`destacado · ${gradeOf(project)}`}
+      className="mb-6"
+    >
       <div className="flex items-start gap-3.5">
-        <div className="w-14 h-14 shrink-0 flex items-center justify-center border border-cyber-cyan/35 bg-cyber-void text-2xl">
+        <div className="w-14 h-14 shrink-0 flex items-center justify-center border border-current/35 bg-cyber-void text-2xl">
           {project.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="font-mono text-[9.5px]">[TOP]</span>
-            <h3
-              data-text={project.title}
-              className="glitch font-display text-[17px] uppercase tracking-wide text-steam-bright"
-            >
-              {project.title}
-            </h3>
-            <span className="font-mono text-[8.5px] uppercase px-1.5 py-0.5 border border-cyber-magenta text-cyber-magenta neon-pulse">
-              destacado
-            </span>
-          </div>
           <p className="font-mono text-[11px] text-steam-dim mb-2 leading-relaxed">
             {project.description}
           </p>
@@ -104,7 +139,7 @@ function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean
       </div>
 
       {project.longDescription ? (
-        <p className="text-[12.5px] leading-relaxed text-steam-text/85 mt-4 pt-3.5 border-t border-cyber-cyan/15">
+        <p className="text-[12.5px] leading-relaxed text-steam-text/85 mt-4 pt-3.5 border-t border-current/15">
           {project.longDescription}
         </p>
       ) : null}
@@ -125,53 +160,30 @@ function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean
         ) : null}
       </div>
 
-      <div className="flex items-center gap-2.5 mt-4">
-        <span className="font-mono text-[9.5px] text-steam-dim whitespace-nowrap">
-          {String(project.done).padStart(2, "0")}/{String(project.total).padStart(2, "0")}
-        </span>
-        <div className="flex-1">
-          <ProgressBar
-            value={pct}
-            className={
-              pct === 100
-                ? "bg-cyber-lime text-cyber-lime bar-glow"
-                : "bg-cyber-cyan text-cyber-cyan bar-glow"
-            }
-            trackClassName="rounded-none bg-cyber-void/70 border border-cyber-cyan/15"
-          />
-        </div>
-        <span className="font-mono text-[9.5px] text-steam-dim w-14 text-right">
-          {pct === 100 ? "COMPLETO" : `${String(pct).padStart(3, "0")}%`}
-        </span>
-      </div>
-    </article>
+      <ProgressRow project={project} />
+    </UnitCard>
   );
 }
 
-/** Tarjeta compacta, plegable, para el resto de los proyectos. */
+/** Unidad compacta, plegable. */
 function CompactCard({ project, index }: { project: Project; index: number }) {
   const [open, setOpen] = useState(false);
   const hasDetail = Boolean(project.longDescription || project.screenshotAssetIds.length);
-  const accent = accentFor(index + 1);
 
   return (
-    <article
-      className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 p-3.5 transition-all duration-200 hover:-translate-y-0.5`}
+    <UnitCard
+      // El código numera la unidad dentro de la vitrina; el 01 es el destacado.
+      code={String(index + 2).padStart(2, "0")}
+      title={project.title}
+      accent={accentFor(index + 2)}
+      aside={gradeOf(project)}
     >
-      <span className="scan-sweep" />
-
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 shrink-0 flex items-center justify-center border border-current/30 bg-cyber-void text-lg">
           {project.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <h3
-            data-text={project.title}
-            className="glitch font-display text-[13px] uppercase tracking-wide text-steam-bright leading-snug"
-          >
-            {project.title}
-          </h3>
-          <p className="font-mono text-[10px] text-steam-dim mt-1 mb-2 leading-relaxed">
+          <p className="font-mono text-[10px] text-steam-dim mb-2 leading-relaxed">
             {project.description}
           </p>
           <TechChips tech={project.tech} />
@@ -207,11 +219,13 @@ function CompactCard({ project, index }: { project: Project; index: number }) {
           <Screenshots ids={project.screenshotAssetIds} />
         </div>
       ) : null}
-    </article>
+
+      <ProgressRow project={project} />
+    </UnitCard>
   );
 }
 
-/** Vitrina de proyectos: destacado arriba, el resto en grilla. */
+/** Vitrina de proyectos: unidad destacada arriba, el resto en grilla. */
 export default function ProjectShowcase() {
   const { data } = usePortfolio();
   const { isOwner } = useAuth();
@@ -236,7 +250,9 @@ export default function ProjectShowcase() {
         <>
           {featured ? <FeaturedCard project={featured} isOwner={isOwner} /> : null}
           {rest.length > 0 ? (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
+            // `gap-6`: los rótulos van montados fuera del borde de cada tarjeta,
+            // así que con menos separación los de dos vecinas se tocan.
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {rest.map((p, i) => (
                 <CompactCard key={p.id} project={p} index={i} />
               ))}
