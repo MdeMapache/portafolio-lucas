@@ -4,6 +4,7 @@ import CvHologram from "@/components/CvHologram";
 import { usePortfolio, useAssetUrl } from "@/components/PortfolioProvider";
 import UnitCard from "@/components/ui/UnitCard";
 import BlockDivider from "@/components/ui/BlockDivider";
+import ExpandableText from "@/components/ui/ExpandableText";
 import Transmission from "@/components/ui/Transmission";
 import { canvasModeFor } from "@/components/ui/UnitCanvas";
 import { accentFor } from "@/components/ui/accents";
@@ -20,7 +21,7 @@ import { accentFor } from "@/components/ui/accents";
 
 /**
  * El color de cada entrada no se declara acá: lo asigna `accentFor` según la
- * posición, y el ciclo ya arranca en óxido, fósforo, peligro y acero.
+ * posición, y el ciclo va óxido, ámbar, acero y verde.
  *
  * `grade` es el rótulo de estado que va apoyado en el borde inferior de la
  * tarjeta, como el grado de un módulo en la pantalla de selección.
@@ -66,7 +67,7 @@ export default function ProfileSection() {
         {profile.tags.map((tag, i) => (
           <span
             key={`${tag}-${i}`}
-            className="hud-clip-sm font-mono text-[10px] px-2.5 py-1 bg-mw-field/30 border border-mw-phosphor/30 text-steam-dim tracking-wider transition-all hover:border-mw-phosphor hover:text-mw-phosphor hover:bg-mw-field/60 hover:shadow-glow-phosphor"
+            className="hud-clip-sm font-mono text-[10px] px-2.5 py-1 bg-mw-field/30 border border-mw-steel/35 text-steam-dim tracking-wider transition-all hover:border-mw-steel hover:text-mw-steelLight hover:bg-mw-field/60 hover:shadow-glow-steel"
           >
             {tag}
           </span>
@@ -80,9 +81,8 @@ export default function ProfileSection() {
           arriba, grado abajo), así que con poca separación los de dos tarjetas
           vecinas se tocan. */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* El ciclo de acentos ya arranca en óxido, fósforo, peligro y acero —
-            exactamente los colores que tenían asignados estas cuatro entradas,
-            así que no hace falta declararlos por separado. */}
+        {/* El color lo asigna `accentFor` por posición; el verde queda último
+            para que no vuelva a teñir la sección entera. */}
         {DOSSIER.map((entry, i) => (
           <UnitCard
             key={entry.code}
@@ -92,7 +92,9 @@ export default function ProfileSection() {
             canvas={canvasModeFor(i)}
             aside={entry.grade}
           >
-            <p className="text-[12.5px] leading-relaxed text-steam-dim">{entry.body}</p>
+            <ExpandableText lines={3} className="text-[12.5px] leading-relaxed text-steam-dim">
+              {entry.body}
+            </ExpandableText>
           </UnitCard>
         ))}
       </div>

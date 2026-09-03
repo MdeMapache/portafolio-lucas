@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+
 import { usePortfolio } from "@/components/PortfolioProvider";
 import UnitCard from "@/components/ui/UnitCard";
 import BlockDivider from "@/components/ui/BlockDivider";
+import ExpandableText from "@/components/ui/ExpandableText";
 import { canvasModeFor } from "@/components/ui/UnitCanvas";
 import { ACCENT_HAZARD, ACCENT_PHOSPHOR, ACCENT_STEEL } from "@/components/ui/accents";
 import type { Education, Experience } from "@/lib/portfolio/types";
@@ -58,21 +61,15 @@ function ExperienceCard({ item, index }: { item: Experience; index: number }) {
         </p>
 
         {item.summary ? (
-          <p className="text-[12.5px] leading-relaxed text-steam-text/85 mb-2">{item.summary}</p>
+          <ExpandableText
+            lines={2}
+            className="text-[12.5px] leading-relaxed text-steam-text/85 mb-1"
+          >
+            {item.summary}
+          </ExpandableText>
         ) : null}
 
-        {item.highlights.length > 0 ? (
-          <ul className="space-y-1">
-            {item.highlights.map((line, i) => (
-              <li key={i} className="flex gap-2 text-[12px] leading-relaxed text-steam-dim">
-                <span aria-hidden className="text-current/60 shrink-0 font-mono text-[10px] mt-[3px]">
-                  ▸
-                </span>
-                <span>{line}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <Highlights lines={item.highlights} />
       </UnitCard>
     </li>
   );
@@ -98,6 +95,47 @@ function EducationRow({ item, index }: { item: Education; index: number }) {
         </p>
       </UnitCard>
     </li>
+  );
+}
+
+/**
+ * Viñetas de un puesto, recortadas a las tres primeras.
+ *
+ * Seis viñetas seguidas por puesto convertían la sección en un muro: 214
+ * palabras y bloques de hasta 73. Mostrar tres y ofrecer el resto mantiene la
+ * densidad de panel sin perder información.
+ */
+function Highlights({ lines }: { lines: string[] }) {
+  const [open, setOpen] = useState(false);
+  if (lines.length === 0) return null;
+
+  const visibles = open ? lines : lines.slice(0, 3);
+  const ocultas = lines.length - visibles.length;
+
+  return (
+    <>
+      <ul className="space-y-1 mt-2">
+        {visibles.map((line, i) => (
+          <li key={i} className="flex gap-2 text-[12px] leading-relaxed text-steam-dim">
+            <span aria-hidden className="text-current/60 shrink-0 font-mono text-[10px] mt-[3px]">
+              ▸
+            </span>
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+
+      {ocultas > 0 || open ? (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-steam-dim hover:text-mw-hazard transition-colors"
+        >
+          {open ? "[ − ] plegar" : `[ + ] ${ocultas} más`}
+        </button>
+      ) : null}
+    </>
   );
 }
 

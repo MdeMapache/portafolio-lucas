@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import ContactSection from "@/components/sections/ContactSection";
 import DemosSection from "@/components/sections/DemosSection";
 import ProfileSection from "@/components/sections/ProfileSection";
@@ -22,16 +21,25 @@ const PANELS: Record<SectionId, React.ComponentType> = {
 };
 
 /**
- * Navegación por paneles holográficos.
+ * Navegación por paneles.
  *
- * No hay cambio de ruta: la sección se monta y desmonta en el cliente, con una
- * animación de "pantalla encendiéndose" (fade + scale-up + parpadeo de tubo).
- * El hash de la URL se mantiene sincronizado para que un enlace directo o el
- * botón de atrás sigan funcionando.
+ * No hay cambio de ruta: la sección se monta y desmonta en el cliente. El hash
+ * de la URL se mantiene sincronizado para que un enlace directo o el botón de
+ * atrás sigan funcionando.
+ *
+ * La transición es CSS y NO framer-motion, y el motivo es concreto: con
+ * `AnimatePresence mode="wait"` el componente esperaba que el panel saliente
+ * confirmara su salida antes de montar el nuevo. Si llegaba otro cambio de
+ * sección durante esa espera —dos clics separados por menos que la duración de
+ * la animación— el protocolo se rompía y el panel quedaba congelado en la
+ * sección vieja de forma permanente, sin recuperarse ni con clics posteriores.
+ *
+ * Con `key={active}` React desmonta el viejo y monta el nuevo de inmediato, y
+ * la animación de encendido corre sobre el que entra. No hay animación de
+ * salida, que es justamente la que nadie nota y la que causaba el bloqueo.
  */
 export default function SectionRouter() {
   const [active, setActive] = useState<SectionId>(DEFAULT_SECTION);
-  const reduceMotion = useReducedMotion();
 
   // Lee el hash al montar y escucha los cambios (botón atrás del navegador).
   useEffect(() => {
@@ -62,31 +70,17 @@ export default function SectionRouter() {
       {/* `pt-14` deja libre la franja donde flota el control de audio, para que
           no se monte sobre la cabecera del panel. */}
       <main className="flex-1 min-w-0 p-4 sm:p-7 lg:p-9 pt-14 sm:pt-14 lg:pt-14">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={active}
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.995, y: -6 }}
-            transition={{ duration: reduceMotion ? 0.15 : 0.3, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <HudPanel code={meta?.code ?? ""} title={meta?.label ?? ""} hint={meta?.hint}>
-              {/*
-                El contenido entra un instante después del marco: primero se
-                "enciende" la chapa y recién ahí aparece lo que muestra.
-
-                La animación va en CSS y NO como un motion.div anidado. Un
-                motion sin `exit` dentro de otro que sí sale bloquea a
-                AnimatePresence en modo "wait": el padre espera que el hijo
-                confirme su salida, el hijo nunca lo hace, y el panel nuevo no
-                se monta nunca. Eso rompía la navegación por completo.
-              */}
-              <div className={reduceMotion ? undefined : "hud-content-in"}>
-                <Panel />
-              </div>
-            </HudPanel>
-          </motion.div>
-        </AnimatePresence>
+        {/* `key` fuerza el remonte, que es lo que reinicia las animaciones CSS
+            de encendido tanto del marco como del contenido. */}
+        <div key={active} className="hud-panel-in">
+          <HudPanel code={meta?.code ?? ""} title={meta?.label ?? ""} hint={meta?.hint}>
+            {/* El contenido entra 140 ms después del marco: primero se enciende
+                la chapa y recién ahí aparece lo que muestra. */}
+            <div className="hud-content-in">
+              <Panel />
+            </div>
+          </HudPanel>
+        </div>
       </main>
     </div>
   );

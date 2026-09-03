@@ -165,11 +165,6 @@ export default function DemosSection() {
 
   return (
     <div>
-      <p className="font-mono text-[11px] text-steam-dim/80 leading-relaxed mb-6">
-        Aplicaciones corriendo en vivo. Se cargan al pedirlas, no al abrir la pestaña. Mientras un
-        demo está en marcha la música del sitio se silencia.
-      </p>
-
       <BlockDivider
         label="unidades desplegables"
         count={`${String(withDemo.length).padStart(2, "0")} en línea`}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { usePortfolio } from "@/components/PortfolioProvider";
 import AssetImage from "@/components/ui/AssetImage";
+import ExpandableText from "@/components/ui/ExpandableText";
 import Panel from "@/components/ui/Panel";
 import SegmentedBar from "@/components/ui/SegmentedBar";
 import SpecGrid from "@/components/ui/SpecGrid";
@@ -176,9 +177,11 @@ function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean
       <UnitSpecs project={project} />
 
       {project.longDescription ? (
-        <p className="text-[12.5px] leading-relaxed text-steam-dim mt-3.5 pt-3 border-t border-current/15">
-          {project.longDescription}
-        </p>
+        <div className="mt-3.5 pt-3 border-t border-current/15">
+          <ExpandableText lines={2} className="text-[12.5px] leading-relaxed text-steam-dim">
+            {project.longDescription}
+          </ExpandableText>
+        </div>
       ) : null}
 
       <Screenshots ids={project.screenshotAssetIds} />

@@ -677,3 +677,18 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .hud-content-in { animation: none; }
 }
+
+/* Encendido de la chapa al cambiar de sección. Reemplaza a la animación de
+   entrada/salida de framer-motion: ver el comentario en SectionRouter. */
+.hud-panel-in {
+  animation: hud-panel-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hud-panel-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-panel-in { animation: none; }
+}
