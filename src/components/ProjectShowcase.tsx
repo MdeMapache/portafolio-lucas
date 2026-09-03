@@ -7,6 +7,7 @@ import AssetImage from "@/components/ui/AssetImage";
 import Panel from "@/components/ui/Panel";
 import ProgressBar from "@/components/ui/ProgressBar";
 import UnitCard from "@/components/ui/UnitCard";
+import { canvasModeFor } from "@/components/ui/UnitCanvas";
 import { accentFor } from "@/components/ui/accents";
 import type { Project } from "@/lib/portfolio/types";
 
@@ -122,6 +123,7 @@ function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean
       code="TOP"
       title={project.title}
       accent={accentFor(1)}
+      canvas="radar"
       size="lg"
       aside={`destacado · ${gradeOf(project)}`}
       className="mb-6"
@@ -176,6 +178,7 @@ function CompactCard({ project, index }: { project: Project; index: number }) {
       code={String(index + 2).padStart(2, "0")}
       title={project.title}
       accent={accentFor(index + 2)}
+      canvas={canvasModeFor(index + 1)}
       aside={gradeOf(project)}
     >
       <div className="flex items-start gap-3">

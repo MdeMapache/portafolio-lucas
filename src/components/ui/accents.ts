@@ -14,6 +14,8 @@ export type Accent = {
   border: string;
   glow: string;
   bg: string;
+  /** El mismo color en hexadecimal, para dibujar en canvas. */
+  hex: string;
 };
 
 export const ACCENTS: Accent[] = [
@@ -22,24 +24,28 @@ export const ACCENTS: Accent[] = [
     border: "border-mw-rust/40",
     glow: "hover:border-mw-rust hover:shadow-glow-rust",
     bg: "bg-mw-rust/10",
+    hex: "#e0701f",
   },
   {
     text: "text-mw-phosphor",
     border: "border-mw-phosphor/40",
     glow: "hover:border-mw-phosphor hover:shadow-glow-phosphor",
     bg: "bg-mw-phosphor/10",
+    hex: "#46ff6e",
   },
   {
     text: "text-mw-hazard",
     border: "border-mw-hazard/40",
     glow: "hover:border-mw-hazard hover:shadow-glow-hazard",
     bg: "bg-mw-hazard/10",
+    hex: "#e8c020",
   },
   {
     text: "text-mw-steel",
     border: "border-mw-steel/40",
     glow: "hover:border-mw-steel hover:shadow-glow-phosphor",
     bg: "bg-mw-steel/10",
+    hex: "#7a72c4",
   },
 ];
 

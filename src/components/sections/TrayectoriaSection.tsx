@@ -2,6 +2,7 @@
 
 import { usePortfolio } from "@/components/PortfolioProvider";
 import UnitCard from "@/components/ui/UnitCard";
+import { canvasModeFor } from "@/components/ui/UnitCanvas";
 import { ACCENT_HAZARD, ACCENT_PHOSPHOR, ACCENT_STEEL } from "@/components/ui/accents";
 import type { Education, Experience } from "@/lib/portfolio/types";
 
@@ -44,6 +45,7 @@ function ExperienceCard({ item, index }: { item: Experience; index: number }) {
         code={`E${String(index + 1).padStart(2, "0")}`}
         title={item.role}
         accent={current ? ACCENT_HAZARD : ACCENT_PHOSPHOR}
+        canvas={canvasModeFor(index)}
         aside={current ? "activo" : "finalizado"}
       >
         <p className="font-mono text-[11px] text-current mb-1">@ {item.company}</p>
@@ -84,6 +86,7 @@ function EducationRow({ item, index }: { item: Education; index: number }) {
         code={`F${String(index + 1).padStart(2, "0")}`}
         title={item.title}
         accent={current ? ACCENT_HAZARD : ACCENT_STEEL}
+        canvas={canvasModeFor(index + 2)}
         aside={current ? "en curso" : "completada"}
       >
         <p className="font-mono text-[11px] text-current mb-1">{item.institution}</p>

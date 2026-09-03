@@ -3,6 +3,7 @@
 import CvHologram from "@/components/CvHologram";
 import { usePortfolio, useAssetUrl } from "@/components/PortfolioProvider";
 import UnitCard from "@/components/ui/UnitCard";
+import { canvasModeFor } from "@/components/ui/UnitCanvas";
 import { accentFor } from "@/components/ui/accents";
 
 /**
@@ -90,6 +91,7 @@ export default function ProfileSection() {
             code={entry.code}
             title={entry.title}
             accent={accentFor(i)}
+            canvas={canvasModeFor(i)}
             aside={entry.grade}
           >
             <p className="text-[12.5px] leading-relaxed text-steam-dim">{entry.body}</p>

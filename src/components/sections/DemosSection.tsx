@@ -55,6 +55,7 @@ function DemoFrame({ project }: { project: Project }) {
       code={selfHosted ? "LOC" : "EXT"}
       title={project.title}
       accent={accent}
+      canvas="radar"
       aside={status}
     >
       {/* Barra de control. Va dentro del cuerpo y no en la cabecera porque el
