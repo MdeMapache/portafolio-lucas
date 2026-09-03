@@ -233,7 +233,7 @@ export default function CvProjection({
         <div className="absolute inset-0 flex items-center justify-center">
           <span
             className={`font-mono text-[11px] ${
-              status === "error" ? "text-cyber-magenta" : "text-cyber-cyan/70 animate-pulse"
+              status === "error" ? "text-mw-rust" : "text-mw-phosphor/70 animate-pulse"
             }`}
           >
             {status === "error" ? "NO SE PUDO PROYECTAR EL DOCUMENTO" : "PROYECTANDO…"}

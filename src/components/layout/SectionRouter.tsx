@@ -71,11 +71,11 @@ export default function SectionRouter() {
             // La opacidad alta no es negociable: con un GIF de alto contraste
             // detrás, el blur solo no alcanza y el texto se vuelve ilegible.
             // Lo holográfico lo dan el borde neón, el blur y la animación.
-            className="holo-edge relative overflow-hidden bg-cyber-void/88 backdrop-blur-xl border border-cyber-cyan/25 p-4 sm:p-6"
+            className="holo-edge relative overflow-hidden bg-mw-void/88 backdrop-blur-xl border border-mw-phosphor/25 p-4 sm:p-6"
           >
             {/* Cabecera del panel: número y nombre de la sección. */}
-            <header className="flex items-baseline gap-3 pb-3 mb-5 border-b border-cyber-cyan/20">
-              <span className="font-mono text-[11px] text-cyber-cyan">{meta?.code}</span>
+            <header className="flex items-baseline gap-3 pb-3 mb-5 border-b border-mw-phosphor/20">
+              <span className="font-mono text-[11px] text-mw-phosphor">{meta?.code}</span>
               <h2
                 data-text={meta?.label}
                 className="glitch font-display text-lg uppercase tracking-[0.2em] text-steam-bright"

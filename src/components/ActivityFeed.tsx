@@ -13,7 +13,7 @@ function ActivityRow({ project, index }: { project: Project; index: number }) {
 
   return (
     <div
-      className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 p-3.5 transition-all duration-200 hover:-translate-y-0.5`}
+      className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-mw-void/40 p-3.5 transition-all duration-200 hover:-translate-y-0.5`}
     >
       <span className="scan-sweep" />
 
@@ -45,15 +45,15 @@ function ActivityRow({ project, index }: { project: Project; index: number }) {
             value={pct}
             className={
               complete
-                ? "bg-cyber-lime text-cyber-lime bar-glow"
-                : "bg-cyber-cyan text-cyber-cyan bar-glow"
+                ? "bg-mw-hazard text-mw-hazard bar-glow"
+                : "bg-mw-phosphor text-mw-phosphor bar-glow"
             }
-            trackClassName="rounded-none bg-cyber-void/70 border border-cyber-cyan/15"
+            trackClassName="rounded-none bg-mw-void/70 border border-mw-phosphor/15"
           />
         </div>
         <span
           className={`font-mono text-[9.5px] w-14 text-right ${
-            complete ? "text-cyber-lime" : "text-steam-dim"
+            complete ? "text-mw-hazard" : "text-steam-dim"
           }`}
         >
           {complete ? "COMPLETO" : `${String(pct).padStart(3, "0")}%`}

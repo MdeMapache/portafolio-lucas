@@ -37,7 +37,7 @@ export default function UnitCard({
 
   return (
     <article
-      className={`group relative border ${large ? "border-2" : ""} ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/90 transition-all duration-200 hover:-translate-y-0.5 ${className}`}
+      className={`group relative border ${large ? "border-2" : ""} ${accent.border} ${accent.text} ${accent.glow} bg-mw-void/90 transition-all duration-200 hover:-translate-y-0.5 ${className}`}
     >
       <span className="scan-sweep" />
       {/* Escuadras dobles, dentro del borde. */}
@@ -45,7 +45,7 @@ export default function UnitCard({
 
       {/* Cabecera montada sobre el borde superior. */}
       <div className="absolute -top-[8px] left-3 right-3 flex items-baseline gap-2 pointer-events-none">
-        <span className="flex items-baseline gap-1.5 bg-cyber-void px-1.5">
+        <span className="flex items-baseline gap-1.5 bg-mw-void px-1.5">
           <span aria-hidden className="font-mono text-[9px] leading-none">
             ◄
           </span>
@@ -62,7 +62,7 @@ export default function UnitCard({
           </span>
         </span>
 
-        <span className="ml-auto bg-cyber-void px-1.5 font-mono text-[9px] leading-none">
+        <span className="ml-auto bg-mw-void px-1.5 font-mono text-[9px] leading-none">
           [{code}]
         </span>
       </div>
@@ -70,7 +70,7 @@ export default function UnitCard({
       <div className={large ? "px-5 pt-7 pb-5" : "px-4 pt-6 pb-4"}>{children}</div>
 
       {aside ? (
-        <div className="absolute -bottom-[7px] right-4 bg-cyber-void px-1.5 font-mono text-[8.5px] uppercase tracking-widest leading-none">
+        <div className="absolute -bottom-[7px] right-4 bg-mw-void px-1.5 font-mono text-[8.5px] uppercase tracking-widest leading-none">
           {aside}
         </div>
       ) : null}

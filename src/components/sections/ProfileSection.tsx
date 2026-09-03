@@ -8,7 +8,7 @@ import { accentFor } from "@/components/ui/accents";
 /**
  * Perfil técnico.
  *
- * El texto usa la narrativa ciberpunk pero NO inventa credenciales: todo lo que
+ * El texto usa la narrativa del juego pero NO inventa credenciales: todo lo que
  * afirma sale del CV real (Ingeniería Informática en Duoc UC, diplomado en
  * ciberseguridad terminado, certificación en modelado de datos, Godot, Angular
  * / Ionic). Un portafolio se usa para postular, y una skill inflada se cae en
@@ -17,7 +17,7 @@ import { accentFor } from "@/components/ui/accents";
 
 /**
  * El color de cada entrada no se declara acá: lo asigna `accentFor` según la
- * posición, y el ciclo ya arranca en magenta, cian, lima y violeta.
+ * posición, y el ciclo ya arranca en óxido, fósforo, peligro y acero.
  *
  * `grade` es el rótulo de estado que va apoyado en el borde inferior de la
  * tarjeta, como el grado de un módulo en la pantalla de selección.
@@ -65,7 +65,7 @@ export default function ProfileSection() {
         {profile.tags.map((tag, i) => (
           <span
             key={`${tag}-${i}`}
-            className="font-mono text-[10px] px-2.5 py-1 border border-cyber-cyan/30 text-steam-dim tracking-wider transition-all hover:border-cyber-cyan hover:text-cyber-cyan hover:shadow-neon-cyan"
+            className="font-mono text-[10px] px-2.5 py-1 border border-mw-phosphor/30 text-steam-dim tracking-wider transition-all hover:border-mw-phosphor hover:text-mw-phosphor hover:shadow-glow-phosphor"
           >
             {tag}
           </span>
@@ -73,7 +73,7 @@ export default function ProfileSection() {
       </div>
 
       {/* Dossier --------------------------------------------------------- */}
-      <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-cyber-cyan/70 mb-3">
+      <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-mw-phosphor/70 mb-3">
         {"// dossier técnico"}
       </h3>
 
@@ -81,7 +81,7 @@ export default function ProfileSection() {
           arriba, grado abajo), así que con poca separación los de dos tarjetas
           vecinas se tocan. */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* El ciclo de acentos ya arranca en magenta, cian, lima y violeta —
+        {/* El ciclo de acentos ya arranca en óxido, fósforo, peligro y acero —
             exactamente los colores que tenían asignados estas cuatro entradas,
             así que no hace falta declararlos por separado. */}
         {DOSSIER.map((entry, i) => (

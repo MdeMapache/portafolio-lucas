@@ -7,9 +7,9 @@ import { accentFor } from "@/components/ui/accents";
 
 /** Color de la barra según el dominio, para que el nivel se lea de un vistazo. */
 function barClassFor(level: number) {
-  if (level >= 75) return "bg-cyber-lime text-cyber-lime bar-glow";
-  if (level >= 50) return "bg-cyber-cyan text-cyber-cyan bar-glow";
-  return "bg-cyber-magenta text-cyber-magenta bar-glow";
+  if (level >= 75) return "bg-mw-hazard text-mw-hazard bar-glow";
+  if (level >= 50) return "bg-mw-phosphor text-mw-phosphor bar-glow";
+  return "bg-mw-rust text-mw-rust bar-glow";
 }
 
 /** Rótulo de equipamiento según el dominio, en la jerga del selector de mechs. */
@@ -29,7 +29,7 @@ export default function TechStack() {
       <Panel
         id="skills"
         title="Stack"
-        aside={<span className="text-cyber-cyan">{String(techBadges.length).padStart(2, "0")}</span>}
+        aside={<span className="text-mw-phosphor">{String(techBadges.length).padStart(2, "0")}</span>}
       >
         <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
           {techBadges.map((badge, i) => {
@@ -38,7 +38,7 @@ export default function TechStack() {
               <div
                 key={badge.id}
                 title={`${badge.label} · nivel ${badge.level}/5`}
-                className={`group relative corner-frame aspect-square flex flex-col items-center justify-center border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 transition-all duration-200 hover:-translate-y-0.5 cursor-default`}
+                className={`group relative corner-frame aspect-square flex flex-col items-center justify-center border ${accent.border} ${accent.text} ${accent.glow} bg-mw-void/40 transition-all duration-200 hover:-translate-y-0.5 cursor-default`}
               >
                 <span className="scan-sweep" />
                 <span className="font-mono text-[13px] font-bold tracking-wider">

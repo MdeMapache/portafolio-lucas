@@ -6,7 +6,7 @@
   base opaco para que nunca se vea el blanco del navegador detrás.
 */
 body {
-  background-color: #04060c;
+  background-color: #010603;
   color: #b8c9d9;
 }
 
@@ -32,7 +32,7 @@ body {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(0, 240, 255, 0.035) 50%,
+    rgba(70, 255, 110, 0.035) 50%,
     transparent 100%
   );
   height: 30%;
@@ -47,8 +47,8 @@ body {
 /* Textura de grilla, encima del fondo y debajo del contenido. */
 .bg-grid-overlay {
   background-image:
-    linear-gradient(rgba(0, 240, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.028) 1px, transparent 1px);
+    linear-gradient(rgba(70, 255, 110, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(70, 255, 110, 0.028) 1px, transparent 1px);
   background-size: 38px 38px;
 }
 
@@ -72,14 +72,14 @@ body {
 
 .glitch:hover::before {
   opacity: 0.85;
-  color: #ff2e97;
+  color: #e0701f;
   transform: translate(-2px, -1px);
   animation: glitch-a 0.5s steps(2, end) infinite;
 }
 
 .glitch:hover::after {
   opacity: 0.85;
-  color: #00f0ff;
+  color: #46ff6e;
   transform: translate(2px, 1px);
   animation: glitch-b 0.5s steps(2, end) infinite;
 }
@@ -113,9 +113,9 @@ body {
 /* Borde neón animado para el panel activo. */
 .holo-edge {
   box-shadow:
-    0 0 0 1px rgba(0, 240, 255, 0.35),
-    0 0 22px rgba(0, 240, 255, 0.12),
-    inset 0 0 40px rgba(0, 240, 255, 0.04);
+    0 0 0 1px rgba(70, 255, 110, 0.35),
+    0 0 22px rgba(70, 255, 110, 0.12),
+    inset 0 0 40px rgba(70, 255, 110, 0.04);
 }
 
 /* ── Proyector holográfico ────────────────────────────────────────────────
@@ -129,7 +129,7 @@ body {
    compuesto, así que funciona igual con el visor de PDF del navegador dentro.
    ──────────────────────────────────────────────────────────────────────── */
 .holo-tint {
-  filter: invert(1) sepia(1) hue-rotate(150deg) saturate(5) brightness(1.05) contrast(1.15);
+  filter: invert(1) sepia(1) hue-rotate(95deg) saturate(5) brightness(1.05) contrast(1.15);
 }
 
 /* Cono de luz que sale del emisor de abajo. El clip-path lo hace trapecio:
@@ -140,8 +140,8 @@ body {
   pointer-events: none;
   background: linear-gradient(
     0deg,
-    rgba(0, 240, 255, 0.22) 0%,
-    rgba(0, 240, 255, 0.07) 45%,
+    rgba(70, 255, 110, 0.22) 0%,
+    rgba(70, 255, 110, 0.07) 45%,
     transparent 85%
   );
   clip-path: polygon(42% 100%, 58% 100%, 100% 0%, 0% 0%);
@@ -161,8 +161,8 @@ body {
   pointer-events: none;
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(0, 240, 255, 0.11) 0px,
-    rgba(0, 240, 255, 0.11) 1px,
+    rgba(70, 255, 110, 0.11) 0px,
+    rgba(70, 255, 110, 0.11) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -179,8 +179,8 @@ body {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(0, 240, 255, 0.16) 45%,
-    rgba(255, 46, 151, 0.08) 55%,
+    rgba(70, 255, 110, 0.16) 45%,
+    rgba(224, 112, 31, 0.08) 55%,
     transparent 100%
   );
   animation: holo-band 4.5s linear infinite;
@@ -206,8 +206,8 @@ body {
 
 /* Emisor: la barra encendida de la que "sale" la proyección. */
 .holo-emitter {
-  background: linear-gradient(90deg, transparent, #00f0ff 25%, #7df9ff 50%, #00f0ff 75%, transparent);
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.75), 0 0 34px rgba(0, 240, 255, 0.35);
+  background: linear-gradient(90deg, transparent, #46ff6e 25%, #a5ffbc 50%, #46ff6e 75%, transparent);
+  box-shadow: 0 0 14px rgba(70, 255, 110, 0.75), 0 0 34px rgba(70, 255, 110, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -229,15 +229,15 @@ body {
    ──────────────────────────────────────────────────────────────────────── */
 
 .bg-preset-steam {
-  background: radial-gradient(ellipse at top, #10203a 0%, #0a1120 45%, #04060c 100%);
+  background: radial-gradient(ellipse at top, #0f5220 0%, #08300f 45%, #010603 100%);
 }
 
 .bg-preset-data {
   background:
     repeating-linear-gradient(
       0deg,
-      rgba(163, 255, 18, 0.07) 0px,
-      rgba(163, 255, 18, 0.07) 1px,
+      rgba(232, 192, 32, 0.07) 0px,
+      rgba(232, 192, 32, 0.07) 1px,
       transparent 1px,
       transparent 4px
     ),
@@ -249,8 +249,8 @@ body {
 .bg-preset-nebula {
   background:
     radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.4) 0%, transparent 45%),
-    radial-gradient(circle at 80% 70%, rgba(0, 240, 255, 0.28) 0%, transparent 45%),
-    linear-gradient(135deg, #12082e 0%, #04060c 70%);
+    radial-gradient(circle at 80% 70%, rgba(70, 255, 110, 0.28) 0%, transparent 45%),
+    linear-gradient(135deg, #12082e 0%, #010603 70%);
   background-size: 200% 200%, 200% 200%, 100% 100%;
   animation: bg-drift 24s ease-in-out infinite alternate;
 }
@@ -259,8 +259,8 @@ body {
   background:
     repeating-linear-gradient(
       90deg,
-      rgba(255, 46, 151, 0.12) 0px,
-      rgba(255, 46, 151, 0.12) 1px,
+      rgba(224, 112, 31, 0.12) 0px,
+      rgba(224, 112, 31, 0.12) 1px,
       transparent 1px,
       transparent 44px
     ),
@@ -377,7 +377,7 @@ body {
   background: linear-gradient(
     100deg,
     transparent 20%,
-    rgba(0, 240, 255, 0.14) 50%,
+    rgba(70, 255, 110, 0.14) 50%,
     transparent 80%
   );
   transform: translateX(-110%);
@@ -490,18 +490,46 @@ body {
   position: absolute;
   inset: 3px;
   pointer-events: none;
-  border: 1px solid transparent;
+  /*
+    Ocho segmentos: dos por esquina, uno horizontal y uno vertical. Van como
+    capas de un mismo pseudo-elemento —no como cuatro nodos extra— para no
+    inflar el DOM con una tarjeta por proyecto.
+
+    Son gruesos (3px) y largos (22px) a propósito: en la referencia las
+    escuadras son el elemento dominante del marco, no un detalle.
+  */
   background:
-    linear-gradient(currentColor, currentColor) top left / 14px 2px no-repeat,
-    linear-gradient(currentColor, currentColor) top left / 2px 14px no-repeat,
-    linear-gradient(currentColor, currentColor) top right / 14px 2px no-repeat,
-    linear-gradient(currentColor, currentColor) top right / 2px 14px no-repeat,
-    linear-gradient(currentColor, currentColor) bottom left / 14px 2px no-repeat,
-    linear-gradient(currentColor, currentColor) bottom left / 2px 14px no-repeat,
-    linear-gradient(currentColor, currentColor) bottom right / 14px 2px no-repeat,
-    linear-gradient(currentColor, currentColor) bottom right / 2px 14px no-repeat;
-  opacity: 0.9;
+    linear-gradient(currentColor, currentColor) top left / 22px 3px no-repeat,
+    linear-gradient(currentColor, currentColor) top left / 3px 22px no-repeat,
+    linear-gradient(currentColor, currentColor) top right / 22px 3px no-repeat,
+    linear-gradient(currentColor, currentColor) top right / 3px 22px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / 22px 3px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / 3px 22px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 22px 3px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 3px 22px no-repeat;
   transition: inset 0.2s ease;
+}
+
+/* Escalón interior: una segunda escuadra más corta, desplazada hacia adentro.
+   Es lo que le da al marco el aspecto escalonado del juego en vez de una
+   simple L. */
+.mw-frame::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  pointer-events: none;
+  opacity: 0.45;
+  background:
+    linear-gradient(currentColor, currentColor) top left / 9px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) top left / 1px 9px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 9px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 1px 9px no-repeat;
+  transition: inset 0.2s ease;
+}
+
+.group:hover > .mw-frame::before,
+.mw-frame:hover::before {
+  inset: 6px;
 }
 
 /* Al enfocar, el marco se cierra sobre el contenido. */

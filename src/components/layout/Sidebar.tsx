@@ -32,7 +32,7 @@ export default function Sidebar({
   const handle = `${profile.name.replace(/\s+/g, "").toUpperCase()}.EXE`;
 
   return (
-    <aside className="relative lg:sticky lg:top-0 lg:h-screen lg:w-[300px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-cyber-cyan/20 bg-cyber-void/92 backdrop-blur-md">
+    <aside className="relative lg:sticky lg:top-0 lg:h-screen lg:w-[300px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-mw-phosphor/20 bg-mw-void/92 backdrop-blur-md">
       {/* Franja de peligro del borde, como la banda lateral del selector de
           unidades. Vertical en escritorio, horizontal cuando el panel colapsa
           arriba. Va apagada: a intensidad plena compite con el contenido. */}
@@ -41,28 +41,28 @@ export default function Sidebar({
         className="hazard-stripe-dim absolute left-0 right-0 bottom-0 h-[3px] lg:left-auto lg:top-0 lg:bottom-0 lg:w-[3px] lg:h-auto"
       />
       {/* Identidad ------------------------------------------------------- */}
-      <div className="p-5 border-b border-cyber-cyan/15">
+      <div className="p-5 border-b border-mw-phosphor/15">
         <div className="flex lg:flex-col lg:items-start items-center gap-4">
           <div className="relative shrink-0">
-            <div className="w-[72px] h-[72px] lg:w-[104px] lg:h-[104px] border border-cyber-cyan/50 shadow-neon-cyan overflow-hidden bg-gradient-to-br from-cyber-magenta/40 to-cyber-violet/40 flex items-center justify-center">
+            <div className="w-[72px] h-[72px] lg:w-[104px] lg:h-[104px] border border-mw-phosphor/50 shadow-glow-phosphor overflow-hidden bg-gradient-to-br from-mw-rust/40 to-mw-steel/40 flex items-center justify-center">
               <AssetImage
                 assetId={profile.avatarAssetId}
                 alt={`Foto de perfil de ${profile.name}`}
                 className="w-full h-full object-cover"
                 fallback={
-                  <span className="font-display text-3xl text-cyber-cyan">
+                  <span className="font-display text-3xl text-mw-phosphor">
                     {profile.name.charAt(0) || "?"}
                   </span>
                 }
               />
             </div>
-            <span className="absolute -bottom-2 -right-2 w-8 h-8 flex items-center justify-center border border-cyber-magenta bg-cyber-void font-mono text-[11px] font-bold text-cyber-magenta shadow-neon-magenta">
+            <span className="absolute -bottom-2 -right-2 w-8 h-8 flex items-center justify-center border border-mw-rust bg-mw-void font-mono text-[11px] font-bold text-mw-rust shadow-glow-rust">
               {profile.level}
             </span>
           </div>
 
           <div className="min-w-0 lg:mt-4">
-            <p className="font-mono text-[10px] tracking-[0.2em] text-cyber-cyan/70 mb-1">
+            <p className="font-mono text-[10px] tracking-[0.2em] text-mw-phosphor/70 mb-1">
               {handle}
             </p>
             <h1
@@ -78,7 +78,7 @@ export default function Sidebar({
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
                   profile.availableForWork
-                    ? "bg-cyber-lime shadow-neon-lime neon-pulse"
+                    ? "bg-mw-hazard shadow-glow-hazard neon-pulse"
                     : "bg-steam-dim"
                 }`}
               />
@@ -102,14 +102,14 @@ export default function Sidebar({
               aria-current={isActive ? "page" : undefined}
               className={`group relative shrink-0 text-left px-3 py-2.5 lg:py-3 border-l-2 transition-all duration-200 ${
                 isActive
-                  ? "border-cyber-cyan bg-cyber-cyan/10 text-steam-bright"
-                  : "border-transparent text-steam-dim hover:border-cyber-magenta hover:bg-cyber-magenta/5 hover:text-steam-bright"
+                  ? "border-mw-phosphor bg-mw-phosphor/10 text-steam-bright"
+                  : "border-transparent text-steam-dim hover:border-mw-rust hover:bg-mw-rust/5 hover:text-steam-bright"
               }`}
             >
               <span className="flex items-baseline gap-2">
                 <span
                   className={`font-mono text-[10px] ${
-                    isActive ? "text-cyber-cyan" : "text-steam-dim/50 group-hover:text-cyber-magenta"
+                    isActive ? "text-mw-phosphor" : "text-steam-dim/50 group-hover:text-mw-rust"
                   }`}
                 >
                   {section.code}
@@ -153,21 +153,21 @@ export default function Sidebar({
       </nav>
 
       {/* Pie: acceso del dueño ------------------------------------------- */}
-      <div className="hidden lg:flex items-center justify-between gap-2 p-3 border-t border-cyber-cyan/15">
+      <div className="hidden lg:flex items-center justify-between gap-2 p-3 border-t border-mw-phosphor/15">
         {ready ? (
           isOwner ? (
             <>
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                className="flex-1 px-3 py-1.5 font-display text-[11px] uppercase tracking-widest border border-cyber-cyan/60 text-cyber-cyan hover:bg-cyber-cyan/10 hover:shadow-neon-cyan transition-all"
+                className="flex-1 px-3 py-1.5 font-display text-[11px] uppercase tracking-widest border border-mw-phosphor/60 text-mw-phosphor hover:bg-mw-phosphor/10 hover:shadow-glow-phosphor transition-all"
               >
                 Modificar
               </button>
               <button
                 type="button"
                 onClick={() => signOut()}
-                className="px-2.5 py-1.5 font-mono text-[10px] text-steam-dim hover:text-cyber-magenta transition-colors"
+                className="px-2.5 py-1.5 font-mono text-[10px] text-steam-dim hover:text-mw-rust transition-colors"
               >
                 salir
               </button>
@@ -178,7 +178,7 @@ export default function Sidebar({
               onClick={() => setSigningIn(true)}
               aria-label="Iniciar sesión"
               title="Acceso del dueño"
-              className="ml-auto font-mono text-[10px] text-steam-dim/40 hover:text-cyber-cyan transition-colors"
+              className="ml-auto font-mono text-[10px] text-steam-dim/40 hover:text-mw-phosphor transition-colors"
             >
               [ ACCESO ]
             </button>

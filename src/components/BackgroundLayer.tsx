@@ -42,7 +42,7 @@ export default function BackgroundLayer() {
       {/* Velo: los presets ya están pensados para leerse encima, así que
           reciben menos; un GIF cualquiera necesita más. */}
       <div
-        className={`absolute inset-0 ${showCustom ? "bg-cyber-void/72" : "bg-cyber-void/40"}`}
+        className={`absolute inset-0 ${showCustom ? "bg-mw-void/72" : "bg-mw-void/40"}`}
       />
       <div className="absolute inset-0 bg-grid-overlay" />
       <div className="absolute inset-0 crt-scanlines" />

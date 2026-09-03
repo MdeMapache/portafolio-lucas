@@ -1,6 +1,8 @@
 "use client";
 
 import { usePortfolio } from "@/components/PortfolioProvider";
+import UnitCard from "@/components/ui/UnitCard";
+import { ACCENT_HAZARD, ACCENT_PHOSPHOR, ACCENT_STEEL } from "@/components/ui/accents";
 import type { Education, Experience } from "@/lib/portfolio/types";
 
 /**
@@ -20,45 +22,31 @@ function period(start: string, end: string | null) {
   return `${start} — ${end ?? "Actualmente"}`;
 }
 
-function ExperienceCard({ item }: { item: Experience }) {
+function ExperienceCard({ item, index }: { item: Experience; index: number }) {
   const current = item.end === null;
 
   return (
-    <li className="group relative pl-8 sm:pl-10 pb-5 last:pb-0">
+    <li className="group relative pl-8 sm:pl-10 pb-6 last:pb-0">
       {/*
         Nodo sobre el cable. El `ring` lo separa del cable que pasa por detrás:
         sin él, el punto se funde con la línea y no se lee como un hito.
       */}
       <span
         aria-hidden
-        className={`absolute left-[7px] sm:left-[11px] top-[7px] w-[9px] h-[9px] rotate-45 ring-4 ring-cyber-void ${
-          current ? "bg-cyber-lime neon-pulse text-cyber-lime" : "bg-cyber-cyan/60 text-cyber-cyan"
+        className={`absolute left-[7px] sm:left-[11px] top-[10px] w-[9px] h-[9px] rotate-45 ring-4 ring-mw-void ${
+          current ? "bg-mw-hazard neon-pulse text-mw-hazard" : "bg-mw-phosphor/60 text-mw-phosphor"
         }`}
       />
 
-      <article
-        className={`relative corner-frame border bg-cyber-void/45 p-3.5 transition-all hover:-translate-y-0.5 ${
-          current
-            ? "border-cyber-lime/40 text-cyber-lime hover:shadow-neon-lime"
-            : "border-cyber-cyan/30 text-cyber-cyan hover:shadow-neon-cyan"
-        }`}
+      {/* El color comunica estado, no ritmo: amarillo si el puesto sigue
+          vigente, fósforo si terminó. */}
+      <UnitCard
+        code={`E${String(index + 1).padStart(2, "0")}`}
+        title={item.role}
+        accent={current ? ACCENT_HAZARD : ACCENT_PHOSPHOR}
+        aside={current ? "activo" : "finalizado"}
       >
-        <span className="scan-sweep" />
-
-        <header className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 mb-1.5">
-          <h4
-            data-text={item.role}
-            className="glitch font-display text-[14.5px] uppercase tracking-wider text-steam-bright"
-          >
-            {item.role}
-          </h4>
-          <span className="font-mono text-[11px] text-current">@ {item.company}</span>
-          {current ? (
-            <span className="font-mono text-[8.5px] uppercase tracking-widest px-1.5 py-0.5 border border-current/50">
-              activo
-            </span>
-          ) : null}
-        </header>
+        <p className="font-mono text-[11px] text-current mb-1">@ {item.company}</p>
 
         <p className="font-mono text-[10px] text-steam-dim/70 mb-2.5">
           {period(item.start, item.end)}
@@ -82,33 +70,29 @@ function ExperienceCard({ item }: { item: Experience }) {
             ))}
           </ul>
         ) : null}
-      </article>
+      </UnitCard>
     </li>
   );
 }
 
-function EducationRow({ item }: { item: Education }) {
+function EducationRow({ item, index }: { item: Education; index: number }) {
   const current = item.end === null;
 
   return (
-    <li className="group flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 border-l-2 border-cyber-violet/40 pl-3 py-1.5 transition-colors hover:border-cyber-violet">
-      <h4
-        data-text={item.title}
-        className="glitch font-display text-[13px] uppercase tracking-wider text-steam-bright"
+    <li>
+      <UnitCard
+        code={`F${String(index + 1).padStart(2, "0")}`}
+        title={item.title}
+        accent={current ? ACCENT_HAZARD : ACCENT_STEEL}
+        aside={current ? "en curso" : "completada"}
       >
-        {item.title}
-      </h4>
-      <span className="font-mono text-[11px] text-cyber-violet">{item.institution}</span>
-      {current ? (
-        <span className="font-mono text-[8.5px] uppercase tracking-widest px-1.5 py-0.5 border border-cyber-lime/50 text-cyber-lime">
-          en curso
-        </span>
-      ) : null}
-      <span className="font-mono text-[10px] text-steam-dim/60 w-full">
-        {period(item.start, item.end)}
-        <span className="mx-1.5 text-steam-dim/40">·</span>
-        {item.location}
-      </span>
+        <p className="font-mono text-[11px] text-current mb-1">{item.institution}</p>
+        <p className="font-mono text-[10px] text-steam-dim/60">
+          {period(item.start, item.end)}
+          <span className="mx-1.5 text-steam-dim/40">·</span>
+          {item.location}
+        </p>
+      </UnitCard>
     </li>
   );
 }
@@ -116,7 +100,7 @@ function EducationRow({ item }: { item: Education }) {
 /** Encabezado de bloque, con el prefijo `//` del resto del sitio. */
 function BlockTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-cyber-cyan/70 mb-3">
+    <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-mw-phosphor/70 mb-3">
       {"// "}
       {children}
     </h3>
@@ -145,10 +129,10 @@ export default function TrayectoriaSection() {
           */}
           <span
             aria-hidden
-            className="absolute left-[11px] sm:left-[15px] top-2 bottom-2 w-px bg-gradient-to-b from-cyber-lime/50 via-cyber-cyan/35 to-transparent"
+            className="absolute left-[11px] sm:left-[15px] top-2 bottom-2 w-px bg-gradient-to-b from-mw-hazard/50 via-mw-phosphor/35 to-transparent"
           />
-          {experience.map((item) => (
-            <ExperienceCard key={item.id} item={item} />
+          {experience.map((item, i) => (
+            <ExperienceCard key={item.id} item={item} index={i} />
           ))}
         </ol>
       )}
@@ -160,9 +144,9 @@ export default function TrayectoriaSection() {
           {education.length === 0 ? (
             <p className="font-mono text-[10.5px] text-steam-dim/60">Sin formación cargada.</p>
           ) : (
-            <ul className="space-y-2">
-              {education.map((item) => (
-                <EducationRow key={item.id} item={item} />
+            <ul className="grid grid-cols-1 gap-6">
+              {education.map((item, i) => (
+                <EducationRow key={item.id} item={item} index={i} />
               ))}
             </ul>
           )}
@@ -177,7 +161,7 @@ export default function TrayectoriaSection() {
               {languages.map((lang) => (
                 <li
                   key={lang.id}
-                  className="font-mono text-[10px] px-2.5 py-1 border border-cyber-cyan/30 text-steam-dim tracking-wider transition-all hover:border-cyber-cyan hover:text-cyber-cyan hover:shadow-neon-cyan"
+                  className="font-mono text-[10px] px-2.5 py-1 border border-mw-phosphor/30 text-steam-dim tracking-wider transition-all hover:border-mw-phosphor hover:text-mw-phosphor hover:shadow-glow-phosphor"
                 >
                   {lang.name}
                   {/* Sin nivel declarado no se inventa uno: se marca el hueco. */}

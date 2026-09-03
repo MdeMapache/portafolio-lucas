@@ -18,31 +18,42 @@ export type Accent = {
 
 export const ACCENTS: Accent[] = [
   {
-    text: "text-cyber-magenta",
-    border: "border-cyber-magenta/40",
-    glow: "hover:border-cyber-magenta hover:shadow-neon-magenta",
-    bg: "bg-cyber-magenta/10",
+    text: "text-mw-rust",
+    border: "border-mw-rust/40",
+    glow: "hover:border-mw-rust hover:shadow-glow-rust",
+    bg: "bg-mw-rust/10",
   },
   {
-    text: "text-cyber-cyan",
-    border: "border-cyber-cyan/40",
-    glow: "hover:border-cyber-cyan hover:shadow-neon-cyan",
-    bg: "bg-cyber-cyan/10",
+    text: "text-mw-phosphor",
+    border: "border-mw-phosphor/40",
+    glow: "hover:border-mw-phosphor hover:shadow-glow-phosphor",
+    bg: "bg-mw-phosphor/10",
   },
   {
-    text: "text-cyber-lime",
-    border: "border-cyber-lime/40",
-    glow: "hover:border-cyber-lime hover:shadow-neon-lime",
-    bg: "bg-cyber-lime/10",
+    text: "text-mw-hazard",
+    border: "border-mw-hazard/40",
+    glow: "hover:border-mw-hazard hover:shadow-glow-hazard",
+    bg: "bg-mw-hazard/10",
   },
   {
-    text: "text-cyber-violet",
-    border: "border-cyber-violet/40",
-    glow: "hover:border-cyber-violet hover:shadow-neon-cyan",
-    bg: "bg-cyber-violet/10",
+    text: "text-mw-steel",
+    border: "border-mw-steel/40",
+    glow: "hover:border-mw-steel hover:shadow-glow-phosphor",
+    bg: "bg-mw-steel/10",
   },
 ];
 
 export function accentFor(index: number): Accent {
   return ACCENTS[index % ACCENTS.length];
 }
+
+/**
+ * Acentos por significado, para cuando el color comunica estado y no sólo
+ * ritmo visual: un puesto vigente va en amarillo de peligro, uno terminado en
+ * fósforo. Elegirlos por nombre deja claro en el código que la decisión no es
+ * decorativa.
+ */
+export const ACCENT_RUST = ACCENTS[0];
+export const ACCENT_PHOSPHOR = ACCENTS[1];
+export const ACCENT_HAZARD = ACCENTS[2];
+export const ACCENT_STEEL = ACCENTS[3];

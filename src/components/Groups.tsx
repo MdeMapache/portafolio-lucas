@@ -14,7 +14,7 @@ export default function Groups() {
   return (
     <Panel
       title="Redes y formación"
-      aside={<span className="text-cyber-cyan">{String(groups.length).padStart(2, "0")}</span>}
+      aside={<span className="text-mw-phosphor">{String(groups.length).padStart(2, "0")}</span>}
       bodyClassName="grid grid-cols-1 gap-2"
     >
       {groups.map((group, i) => {
@@ -40,7 +40,7 @@ export default function Groups() {
           </>
         );
 
-        const shell = `group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`;
+        const shell = `group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-mw-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`;
 
         return group.url ? (
           <a

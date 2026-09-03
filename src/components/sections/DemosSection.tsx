@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePortfolio } from "@/components/PortfolioProvider";
+import UnitCard from "@/components/ui/UnitCard";
+import { ACCENT_HAZARD, ACCENT_PHOSPHOR, ACCENT_STEEL } from "@/components/ui/accents";
 import { duckAudio } from "@/lib/audioBus";
 import type { Project } from "@/lib/portfolio/types";
 
@@ -43,30 +45,34 @@ function DemoFrame({ project }: { project: Project }) {
 
   const selfHosted = project.demoUrl.startsWith("/");
 
+  // El color comunica estado: amarillo mientras corre, y en reposo distingue
+  // un build propio (fósforo) de uno alojado afuera (acero).
+  const accent = running ? ACCENT_HAZARD : selfHosted ? ACCENT_PHOSPHOR : ACCENT_STEEL;
+  const status = running ? (loaded ? "en marcha" : "cargando…") : "en espera";
+
   return (
-    <article className="group relative corner-frame border border-cyber-cyan/30 text-cyber-cyan bg-cyber-void/50 transition-shadow hover:shadow-neon-cyan">
-      <span className="scan-sweep" />
+    <UnitCard
+      code={selfHosted ? "LOC" : "EXT"}
+      title={project.title}
+      accent={accent}
+      aside={status}
+    >
+      {/* Barra de control. Va dentro del cuerpo y no en la cabecera porque el
+          borde superior ya lo ocupan el título y el código de la unidad. */}
+      <div className="flex items-center gap-2.5 mb-2.5">
+        <span className="text-base shrink-0">{project.icon}</span>
+        <p className="font-mono text-[10px] text-steam-dim/70 leading-snug flex-1 min-w-0">
+          {project.description}
+        </p>
 
-      <header className="flex items-center gap-2.5 px-3 py-2 border-b border-cyber-cyan/20 bg-cyber-cyan/5">
-        <span className="text-base">{project.icon}</span>
-        <h3
-          data-text={project.title}
-          className="glitch font-display text-[13px] uppercase tracking-wider text-steam-bright truncate"
-        >
-          {project.title}
-        </h3>
-        <span className="font-mono text-[8.5px] uppercase px-1.5 py-0.5 border border-current/40 shrink-0">
-          {selfHosted ? "local" : "externo"}
-        </span>
-
-        <div className="ml-auto flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
           {running ? (
             <>
               <button
                 type="button"
                 onClick={() => frameRef.current?.requestFullscreen?.()}
                 title="Pantalla completa"
-                className="font-mono text-[10px] text-steam-dim hover:text-cyber-cyan transition-colors"
+                className="font-mono text-[11px] text-steam-dim hover:text-current transition-colors"
               >
                 ⛶
               </button>
@@ -74,7 +80,7 @@ function DemoFrame({ project }: { project: Project }) {
                 type="button"
                 onClick={() => setExpanded((v) => !v)}
                 title={expanded ? "Reducir" : "Agrandar"}
-                className="font-mono text-[10px] text-steam-dim hover:text-cyber-cyan transition-colors"
+                className="font-mono text-[10px] text-steam-dim hover:text-current transition-colors"
               >
                 {expanded ? "[ − ]" : "[ + ]"}
               </button>
@@ -84,16 +90,16 @@ function DemoFrame({ project }: { project: Project }) {
             href={project.demoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-[10px] text-cyber-cyan hover:text-cyber-magenta transition-colors"
+            className="font-mono text-[10px] text-current hover:text-mw-rust transition-colors"
           >
             ABRIR ↗
           </a>
         </div>
-      </header>
+      </div>
 
       <div
-        className={`relative bg-black transition-[height] ${
-          expanded ? "h-[75vh]" : "h-[320px]"
+        className={`relative bg-black border border-current/25 transition-[height] ${
+          expanded ? "h-[75vh]" : "h-[300px]"
         }`}
       >
         {!running ? (
@@ -107,27 +113,22 @@ function DemoFrame({ project }: { project: Project }) {
             onClick={() => setRunning(true)}
             className="absolute inset-0 flex flex-col items-center justify-center gap-2 group/play"
           >
-            <span className="font-mono text-3xl text-cyber-cyan transition-transform group-hover/play:scale-110">
+            <span className="font-mono text-3xl text-current transition-transform group-hover/play:scale-110">
               ▶
             </span>
             <span className="font-mono text-[10px] uppercase tracking-widest text-steam-dim">
               iniciar demo
             </span>
-            <span className="font-mono text-[9px] text-steam-dim/50">
-              puede pesar varios MB
-            </span>
+            <span className="font-mono text-[9px] text-steam-dim/50">puede pesar varios MB</span>
           </button>
         ) : (
           <>
             {!loaded ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
-                <span className="font-mono text-[11px] text-cyber-cyan/70 animate-pulse">
-                  CARGANDO…
-                </span>
+                <span className="font-mono text-[11px] text-current animate-pulse">CARGANDO…</span>
                 {timedOut ? (
-                  <span className="font-mono text-[9.5px] text-cyber-magenta max-w-[80%] text-center leading-relaxed">
-                    Tarda de más. Puede que el sitio bloquee el embebido —
-                    probá con ABRIR ↗
+                  <span className="font-mono text-[9.5px] text-mw-rust max-w-[80%] text-center leading-relaxed">
+                    Tarda de más. Puede que el sitio bloquee el embebido — probá con ABRIR ↗
                   </span>
                 ) : null}
               </div>
@@ -152,13 +153,7 @@ function DemoFrame({ project }: { project: Project }) {
           </>
         )}
       </div>
-
-      <footer className="px-3 py-2 border-t border-cyber-cyan/15">
-        <p className="font-mono text-[10px] text-steam-dim/70 leading-relaxed">
-          {project.description}
-        </p>
-      </footer>
-    </article>
+    </UnitCard>
   );
 }
 
@@ -168,23 +163,24 @@ export default function DemosSection() {
 
   return (
     <div>
-      <p className="font-mono text-[11px] text-steam-dim/80 leading-relaxed mb-5">
-        Aplicaciones corriendo en vivo. Se cargan al pedirlas, no al abrir la
-        pestaña. Mientras un demo está en marcha la música del sitio se silencia.
+      <p className="font-mono text-[11px] text-steam-dim/80 leading-relaxed mb-6">
+        Aplicaciones corriendo en vivo. Se cargan al pedirlas, no al abrir la pestaña. Mientras un
+        demo está en marcha la música del sitio se silencia.
       </p>
 
       {withDemo.length === 0 ? (
-        <div className="corner-frame text-cyber-cyan/50 border border-dashed border-cyber-cyan/25 p-8 text-center">
+        <div className="mw-frame text-mw-phosphor/50 border border-dashed border-mw-phosphor/25 p-8 text-center">
           <p className="font-mono text-[11px] text-steam-dim">Sin demos publicados todavía.</p>
           <p className="font-mono text-[10px] text-steam-dim/60 mt-2 leading-relaxed">
             Cargá la URL en Modificar perfil → Proyectos → Demo en vivo.
             <br />
-            Para un build propio en <code className="text-cyber-cyan">public/demos/</code>, usá una
-            ruta como <code className="text-cyber-cyan">/demos/mi-juego/index.html</code>.
+            Para un build propio en <code className="text-mw-phosphor">public/demos/</code>, usá una
+            ruta como <code className="text-mw-phosphor">/demos/mi-juego/index.html</code>.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        // `gap-6`: los rótulos van montados fuera del borde de cada tarjeta.
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {withDemo.map((project) => (
             <DemoFrame key={project.id} project={project} />
           ))}

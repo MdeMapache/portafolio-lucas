@@ -228,7 +228,7 @@ export default function AudioController() {
       {/* `loop` en el elemento y no en JS: el navegador reinicia sin corte. */}
       <audio ref={audioRef} src="/audio/theme.mp3" loop preload="auto" />
 
-      <div className="fixed top-3 right-3 z-40 flex items-center gap-2.5 px-2.5 py-1.5 border border-cyber-cyan/30 bg-cyber-void/85 backdrop-blur-md">
+      <div className="fixed top-3 right-3 z-40 flex items-center gap-2.5 px-2.5 py-1.5 border border-mw-phosphor/30 bg-mw-void/85 backdrop-blur-md">
         {/* Silenciar ---------------------------------------------------- */}
         <button
           type="button"
@@ -236,7 +236,7 @@ export default function AudioController() {
           aria-pressed={enabled}
           title={enabled ? "Silenciar" : "Activar audio"}
           className={`flex items-end gap-[2px] h-3.5 transition-colors ${
-            enabled ? "text-cyber-lime" : "text-steam-dim hover:text-cyber-cyan"
+            enabled ? "text-mw-hazard" : "text-steam-dim hover:text-mw-phosphor"
           }`}
         >
           {[0, 1, 2].map((i) => (
@@ -260,12 +260,12 @@ export default function AudioController() {
           value={percent}
           onChange={(e) => changeVolume(Number(e.target.value) / 100)}
           aria-label="Volumen de la música"
-          className="w-20 sm:w-24 h-1 accent-cyber-cyan cursor-pointer"
+          className="w-20 sm:w-24 h-1 accent-mw-phosphor cursor-pointer"
         />
 
         <span
           className={`font-mono text-[9px] w-7 text-right tabular-nums ${
-            ducked ? "text-cyber-magenta" : "text-steam-dim"
+            ducked ? "text-mw-rust" : "text-steam-dim"
           }`}
           title={ducked ? "Silenciada mientras corre un demo" : undefined}
         >

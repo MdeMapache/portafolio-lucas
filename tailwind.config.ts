@@ -1,15 +1,16 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Paleta ciberpunk.
+ * Paleta Metal Warriors.
  *
- * Los tokens conservan los nombres `steam-*` a propósito: los usan ~15
- * componentes y renombrarlos sería un diff enorme sin ganancia funcional. Lo
- * que cambió son los VALORES — retonalizados a negro profundo con neón — así
- * que toda la app se repinta desde este archivo.
+ * La referencia son las pantallas de selección de unidades del juego: campo
+ * verde saturado, texto en fósforo brillante, blindaje naranja óxido y franjas
+ * de peligro amarillas, todo sobre canaletas negras.
  *
- * Los `cyber-*` son los acentos nuevos: se usan donde el neón tiene que gritar
- * (bordes activos, glitch, brillos), no como color de texto general.
+ * Los tokens `steam-*` conservan el nombre porque los usan ~20 componentes,
+ * pero sus VALORES pasaron de azul a verde. Los antiguos `cyber-*` sí se
+ * renombraron a `mw-*`: mantener un token llamado "cyan" que en realidad pinta
+ * verde habría sido peor que el diff del renombrado.
  */
 export default {
   content: ["./src/app/**/*.{ts,tsx}", "./src/components/**/*.{ts,tsx}"],
@@ -17,42 +18,35 @@ export default {
     extend: {
       colors: {
         steam: {
-          bgDeep: "#04060c",
-          bgTop: "#0a1120",
-          panel: "#080e1a",
-          panel2: "#0f1829",
-          line: "#1b3350",
-          text: "#b8c9d9",
-          dim: "#6b8299",
-          bright: "#eaf6ff",
-          link: "#00f0ff",
-          linkHover: "#7df9ff",
-          green: "#a3ff12",
-          gold: "#ff2e97",
+          bgDeep: "#010603",
+          bgTop: "#0a2e12",
+          panel: "#04180a",
+          panel2: "#0a3d16",
+          line: "#1f9c40",
+          text: "#b6e8c2",
+          dim: "#5d9c6b",
+          bright: "#eafff0",
+          link: "#46ff6e",
+          linkHover: "#a5ffbc",
+          green: "#46ff6e",
+          gold: "#e8c020",
         },
-        /*
-          Paleta prestada de las pantallas de selección de Metal Warriors:
-          verde fósforo sobre campo verde oscuro, franjas de peligro amarillas
-          y el naranja oxidado del blindaje.
-
-          Convive con `cyber-*` en vez de reemplazarla: el cian y el magenta
-          siguen siendo la identidad del sitio, y esto entra donde la referencia
-          aporta — marcos de selección, listas de equipamiento, avisos.
-        */
         mw: {
-          phosphor: "#4aff7a",
-          phosphorDim: "#1f8f3c",
-          field: "#0a2e12",
-          fieldDeep: "#04160a",
-          hazard: "#e0b91c",
-          rust: "#c2551f",
-        },
-        cyber: {
-          cyan: "#00f0ff",
-          magenta: "#ff2e97",
-          lime: "#a3ff12",
-          violet: "#8b5cf6",
-          void: "#04060c",
+          /** Texto de terminal: el verde que usan los nombres de unidad. */
+          phosphor: "#46ff6e",
+          phosphorDim: "#1f9c40",
+          /** Blindaje de los mechs. */
+          rust: "#e0701f",
+          rustDeep: "#a83c12",
+          /** Franjas de advertencia. */
+          hazard: "#e8c020",
+          /** El azul violáceo del Ballistic, para la cuarta posición del ciclo. */
+          steel: "#7a72c4",
+          /** Campo verde de los paneles de selección. */
+          field: "#0a4a18",
+          fieldDeep: "#052a0c",
+          /** Canaletas entre paneles. */
+          void: "#010603",
         },
       },
       fontFamily: {
@@ -61,9 +55,10 @@ export default {
         mono: ["var(--font-jetbrains)", "monospace"],
       },
       boxShadow: {
-        "neon-cyan": "0 0 8px rgba(0,240,255,.45), inset 0 0 12px rgba(0,240,255,.08)",
-        "neon-magenta": "0 0 8px rgba(255,46,151,.45), inset 0 0 12px rgba(255,46,151,.08)",
-        "neon-lime": "0 0 8px rgba(163,255,18,.45)",
+        "glow-phosphor": "0 0 9px rgba(70,255,110,.5), inset 0 0 14px rgba(70,255,110,.08)",
+        "glow-rust": "0 0 9px rgba(224,112,31,.5), inset 0 0 14px rgba(224,112,31,.08)",
+        "glow-hazard": "0 0 9px rgba(232,192,32,.5), inset 0 0 14px rgba(232,192,32,.08)",
+        "glow-steel": "0 0 9px rgba(122,114,196,.5), inset 0 0 14px rgba(122,114,196,.08)",
       },
     },
   },

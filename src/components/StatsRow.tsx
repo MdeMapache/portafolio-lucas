@@ -18,7 +18,7 @@ export default function StatsRow() {
           // las escuadras con `currentColor`.
           <div
             key={stat.id}
-            className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 p-4 text-center transition-all duration-200 hover:-translate-y-0.5`}
+            className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-mw-void/40 p-4 text-center transition-all duration-200 hover:-translate-y-0.5`}
           >
             <span className="scan-sweep" />
             <div className="data-flicker font-display text-3xl font-bold leading-none">

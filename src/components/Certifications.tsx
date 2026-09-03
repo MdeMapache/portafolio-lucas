@@ -14,7 +14,7 @@ export default function Certifications() {
   return (
     <Panel
       title="Certificaciones"
-      aside={<span className="text-cyber-cyan">{String(certifications.length).padStart(2, "0")}</span>}
+      aside={<span className="text-mw-phosphor">{String(certifications.length).padStart(2, "0")}</span>}
       bodyClassName="grid grid-cols-1 gap-2"
     >
       {certifications.map((cert, i) => {
@@ -22,7 +22,7 @@ export default function Certifications() {
         return (
           <article
             key={cert.id}
-            className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`}
+            className={`group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-mw-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`}
           >
             <span className="scan-sweep" />
             <div className="flex items-baseline gap-2">

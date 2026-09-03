@@ -16,7 +16,7 @@ export default function Contact() {
       aside={
         <span
           className={
-            profile.availableForWork ? "text-cyber-lime neon-pulse" : "text-steam-dim"
+            profile.availableForWork ? "text-mw-hazard neon-pulse" : "text-steam-dim"
           }
         >
           {profile.availableForWork ? "ONLINE" : "AUSENTE"}
@@ -43,14 +43,14 @@ export default function Contact() {
               </div>
               <span
                 className={`shrink-0 w-1.5 h-1.5 rounded-full ${
-                  contact.online ? "bg-cyber-lime neon-pulse" : "bg-steam-dim"
+                  contact.online ? "bg-mw-hazard neon-pulse" : "bg-steam-dim"
                 }`}
               />
             </div>
           </>
         );
 
-        const shell = `group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-cyber-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`;
+        const shell = `group relative corner-frame border ${accent.border} ${accent.text} ${accent.glow} bg-mw-void/40 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5`;
 
         return contact.url ? (
           <a

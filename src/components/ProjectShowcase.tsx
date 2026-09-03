@@ -38,8 +38,8 @@ function ActionLink({
       rel="noopener noreferrer"
       className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border transition-all hover:-translate-y-px ${
         primary
-          ? "border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan/10 hover:shadow-neon-cyan"
-          : "border-steam-dim/40 text-steam-dim hover:border-cyber-magenta hover:text-cyber-magenta hover:shadow-neon-magenta"
+          ? "border-mw-phosphor text-mw-phosphor hover:bg-mw-phosphor/10 hover:shadow-glow-phosphor"
+          : "border-steam-dim/40 text-steam-dim hover:border-mw-rust hover:text-mw-rust hover:shadow-glow-rust"
       }`}
     >
       {children} ↗
@@ -70,7 +70,7 @@ function Screenshots({ ids }: { ids: string[] }) {
       {ids.map((id) => (
         <div
           key={id}
-          className="w-32 h-20 border border-cyber-cyan/25 overflow-hidden bg-black transition-all hover:border-cyber-cyan hover:shadow-neon-cyan"
+          className="w-32 h-20 border border-mw-phosphor/25 overflow-hidden bg-black transition-all hover:border-mw-phosphor hover:shadow-glow-phosphor"
         >
           <AssetImage
             assetId={id}
@@ -98,15 +98,15 @@ function ProgressRow({ project }: { project: Project }) {
           value={pct}
           className={
             complete
-              ? "bg-cyber-lime text-cyber-lime bar-glow"
-              : "bg-cyber-cyan text-cyber-cyan bar-glow"
+              ? "bg-mw-hazard text-mw-hazard bar-glow"
+              : "bg-mw-phosphor text-mw-phosphor bar-glow"
           }
-          trackClassName="rounded-none bg-cyber-void/70 border border-cyber-cyan/15"
+          trackClassName="rounded-none bg-mw-void/70 border border-mw-phosphor/15"
         />
       </div>
       <span
         className={`font-mono text-[9.5px] w-14 text-right ${
-          complete ? "text-cyber-lime" : "text-steam-dim"
+          complete ? "text-mw-hazard" : "text-steam-dim"
         }`}
       >
         {complete ? "COMPLETO" : `${String(pct).padStart(3, "0")}%`}
@@ -127,7 +127,7 @@ function FeaturedCard({ project, isOwner }: { project: Project; isOwner: boolean
       className="mb-6"
     >
       <div className="flex items-start gap-3.5">
-        <div className="w-14 h-14 shrink-0 flex items-center justify-center border border-current/35 bg-cyber-void text-2xl">
+        <div className="w-14 h-14 shrink-0 flex items-center justify-center border border-current/35 bg-mw-void text-2xl">
           {project.icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -179,7 +179,7 @@ function CompactCard({ project, index }: { project: Project; index: number }) {
       aside={gradeOf(project)}
     >
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 shrink-0 flex items-center justify-center border border-current/30 bg-cyber-void text-lg">
+        <div className="w-10 h-10 shrink-0 flex items-center justify-center border border-current/30 bg-mw-void text-lg">
           {project.icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -202,7 +202,7 @@ function CompactCard({ project, index }: { project: Project; index: number }) {
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
-            className="px-2 py-1.5 font-mono text-[10px] uppercase tracking-widest text-steam-dim hover:text-cyber-cyan transition-colors"
+            className="px-2 py-1.5 font-mono text-[10px] uppercase tracking-widest text-steam-dim hover:text-mw-phosphor transition-colors"
           >
             {open ? "[ − ] menos" : "[ + ] detalle"}
           </button>
@@ -238,7 +238,7 @@ export default function ProjectShowcase() {
     <Panel
       id="proyectos"
       title="Vitrina"
-      aside={<span className="text-cyber-cyan">{String(projects.length).padStart(2, "0")}</span>}
+      aside={<span className="text-mw-phosphor">{String(projects.length).padStart(2, "0")}</span>}
     >
       {projects.length === 0 ? (
         <p className="font-mono text-[10.5px] text-steam-dim">

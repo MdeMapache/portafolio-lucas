@@ -25,7 +25,7 @@ import CvProjection from "./CvProjection";
  */
 
 /** Escuadras del visor, en las cuatro esquinas. */
-function Brackets({ className = "border-cyber-cyan/70" }: { className?: string }) {
+function Brackets({ className = "border-mw-phosphor/70" }: { className?: string }) {
   const corners = [
     "top-1.5 left-1.5 border-t border-l",
     "top-1.5 right-1.5 border-t border-r",
@@ -78,21 +78,21 @@ export default function CvHologram({ url }: { url: string | null }) {
     <section aria-labelledby="cv-holo-title">
       <h3
         id="cv-holo-title"
-        className="font-mono text-[10px] uppercase tracking-[0.25em] text-cyber-cyan/70 mb-3"
+        className="font-mono text-[10px] uppercase tracking-[0.25em] text-mw-phosphor/70 mb-3"
       >
         {"// documento adjunto"}
       </h3>
 
       {/* Lectura de estado, al estilo de una consola. */}
       <div className="flex items-center gap-2 mb-2 font-mono text-[9.5px] uppercase tracking-widest">
-        <span className="text-cyber-cyan">doc://cv.pdf</span>
+        <span className="text-mw-phosphor">doc://cv.pdf</span>
         <span
           aria-hidden
           className={`w-1.5 h-1.5 rounded-full ${
-            url ? "bg-cyber-lime neon-pulse text-cyber-lime" : "bg-steam-dim/50"
+            url ? "bg-mw-hazard neon-pulse text-mw-hazard" : "bg-steam-dim/50"
           }`}
         />
-        <span className={url ? "text-cyber-lime" : "text-steam-dim/60"}>
+        <span className={url ? "text-mw-hazard" : "text-steam-dim/60"}>
           {url ? "señal estable" : "sin señal"}
         </span>
       </div>
@@ -108,7 +108,7 @@ export default function CvHologram({ url }: { url: string | null }) {
             La altura es fija y el documento se recorta: es una vista previa, no
             el documento entero. Lo que sobra se ve al ampliar.
           */}
-          <div className="relative h-[26rem] overflow-hidden border border-cyber-cyan/40 bg-black">
+          <div className="relative h-[26rem] overflow-hidden border border-mw-phosphor/40 bg-black">
             <CvProjection url={url} tinted className="w-full" />
             <Overlays />
             <Brackets />
@@ -117,12 +117,12 @@ export default function CvHologram({ url }: { url: string | null }) {
                 dura y le da fondo a la llamada a la acción. */}
             <span
               aria-hidden
-              className="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-cyber-void via-cyber-void/80 to-transparent"
+              className="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-mw-void via-mw-void/80 to-transparent"
             />
             <span
               className="absolute inset-x-0 bottom-0 z-20 py-2 text-center font-mono text-[9.5px]
-                         uppercase tracking-widest text-cyber-cyan border-t border-cyber-cyan/30
-                         transition-colors group-hover:text-steam-bright group-hover:bg-cyber-cyan/15"
+                         uppercase tracking-widest text-mw-phosphor border-t border-mw-phosphor/30
+                         transition-colors group-hover:text-steam-bright group-hover:bg-mw-phosphor/15"
             >
               ampliar proyección
             </span>
@@ -132,18 +132,18 @@ export default function CvHologram({ url }: { url: string | null }) {
           <span aria-hidden className="block h-px mt-px holo-emitter" />
           <span
             aria-hidden
-            className="block h-6 bg-gradient-to-b from-cyber-cyan/12 to-transparent blur-[2px]"
+            className="block h-6 bg-gradient-to-b from-mw-phosphor/12 to-transparent blur-[2px]"
           />
         </button>
       ) : (
         /* Sin PDF cargado el proyector queda encendido pero vacío: comunica que
            la función existe y que falta el documento. */
-        <div className="relative h-44 border border-dashed border-cyber-cyan/25 bg-black/60 overflow-hidden">
+        <div className="relative h-44 border border-dashed border-mw-phosphor/25 bg-black/60 overflow-hidden">
           <span aria-hidden className="holo-beam opacity-40" />
           <span aria-hidden className="holo-lines opacity-60" />
-          <Brackets className="border-cyber-cyan/30" />
+          <Brackets className="border-mw-phosphor/30" />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-4 text-center">
-            <span className="font-mono text-[11px] text-cyber-cyan/60 animate-pulse">
+            <span className="font-mono text-[11px] text-mw-phosphor/60 animate-pulse">
               SIN DOCUMENTO
             </span>
             <span className="font-mono text-[9.5px] text-steam-dim/60 leading-relaxed">
@@ -164,12 +164,12 @@ export default function CvHologram({ url }: { url: string | null }) {
             aria-modal="true"
             aria-label="Curriculum Vitae"
             onClick={(e) => e.stopPropagation()}
-            className="holo-edge relative w-full max-w-3xl h-[90vh] flex flex-col bg-cyber-void border border-cyber-cyan/40"
+            className="holo-edge relative w-full max-w-3xl h-[90vh] flex flex-col bg-mw-void border border-mw-phosphor/40"
           >
-            <header className="flex items-center gap-3 px-4 py-2.5 border-b border-cyber-cyan/25 shrink-0">
+            <header className="flex items-center gap-3 px-4 py-2.5 border-b border-mw-phosphor/25 shrink-0">
               <span
                 data-text="Curriculum Vitae"
-                className="glitch font-display text-[13px] uppercase tracking-widest text-cyber-cyan"
+                className="glitch font-display text-[13px] uppercase tracking-widest text-mw-phosphor"
               >
                 Curriculum Vitae
               </span>
@@ -182,7 +182,7 @@ export default function CvHologram({ url }: { url: string | null }) {
                   title="Alternar el tinte holográfico para leer el PDF original"
                   className={`font-mono text-[9.5px] uppercase tracking-widest px-2 py-0.5 border transition-colors ${
                     tinted
-                      ? "border-cyber-cyan/60 text-cyber-cyan"
+                      ? "border-mw-phosphor/60 text-mw-phosphor"
                       : "border-steam-line text-steam-dim hover:text-steam-bright"
                   }`}
                 >
@@ -192,7 +192,7 @@ export default function CvHologram({ url }: { url: string | null }) {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-[10px] text-steam-dim hover:text-cyber-cyan transition-colors"
+                  className="font-mono text-[10px] text-steam-dim hover:text-mw-phosphor transition-colors"
                 >
                   PESTAÑA NUEVA ↗
                 </a>
@@ -200,7 +200,7 @@ export default function CvHologram({ url }: { url: string | null }) {
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Cerrar"
-                  className="text-steam-dim hover:text-cyber-magenta text-lg leading-none transition-colors"
+                  className="text-steam-dim hover:text-mw-rust text-lg leading-none transition-colors"
                 >
                   ×
                 </button>

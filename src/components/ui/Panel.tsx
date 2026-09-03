@@ -23,11 +23,11 @@ export default function Panel({
 }) {
   return (
     <section id={id} className={`mb-7 ${className}`}>
-      <header className="flex items-baseline gap-2 mb-3 pb-1.5 border-b border-cyber-cyan/15">
-        <span className="font-mono text-[10px] text-cyber-cyan/50">{"//"}</span>
+      <header className="flex items-baseline gap-2 mb-3 pb-1.5 border-b border-mw-phosphor/15">
+        <span className="font-mono text-[10px] text-mw-phosphor/50">{"//"}</span>
         <h2
           data-text={title}
-          className="glitch font-mono text-[10px] uppercase tracking-[0.25em] text-cyber-cyan/80"
+          className="glitch font-mono text-[10px] uppercase tracking-[0.25em] text-mw-phosphor/80"
         >
           {title}
         </h2>
