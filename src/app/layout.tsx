@@ -4,6 +4,7 @@ import AudioController from "@/components/AudioController";
 import { AuthProvider } from "@/components/AuthProvider";
 import BackgroundLayer from "@/components/BackgroundLayer";
 import { PortfolioProvider } from "@/components/PortfolioProvider";
+import { getProfileForMetadata, getSiteUrl } from "@/lib/portfolio/profileServer";
 import "./globals.css";
 
 const oswald = Oswald({
@@ -22,10 +23,41 @@ const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
 });
 
-export const metadata: Metadata = {
-  title: "Mapache — Portafolio Dev",
-  description: "Portafolio de desarrollo de software, estilo perfil de Steam.",
-};
+/**
+ * Metadatos y vista previa del enlace.
+ *
+ * Se generan en el servidor leyendo el perfil de Supabase, para que el título y
+ * la descripción que ve alguien al pegar la URL sean los mismos que el sitio
+ * muestra. Con metadatos fijos, cambiar el nombre desde el panel dejaba el
+ * `<head>` desactualizado sin que nadie se enterara.
+ *
+ * `getProfileForMetadata` nunca falla: si Supabase está pausado o caído cae a
+ * los defaults, así que la página se sigue sirviendo igual.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const profile = await getProfileForMetadata();
+  const site = getSiteUrl();
+  const titulo = `${profile.name} — ${profile.role}`;
+
+  return {
+    metadataBase: new URL(site),
+    title: titulo,
+    description: profile.bio,
+    openGraph: {
+      type: "profile",
+      locale: "es_CL",
+      url: site,
+      title: titulo,
+      description: profile.bio,
+      siteName: `${profile.name} · Portafolio`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titulo,
+      description: profile.bio,
+    },
+  };
+}
 
 export default function RootLayout({
   children,
