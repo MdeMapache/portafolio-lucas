@@ -2,14 +2,14 @@
 
 import { usePortfolio } from "@/components/PortfolioProvider";
 import Panel from "@/components/ui/Panel";
-import ProgressBar from "@/components/ui/ProgressBar";
+import SegmentedBar from "@/components/ui/SegmentedBar";
 import { accentFor } from "@/components/ui/accents";
 
 /** Color de la barra según el dominio, para que el nivel se lea de un vistazo. */
 function barClassFor(level: number) {
-  if (level >= 75) return "bg-mw-hazard text-mw-hazard bar-glow";
-  if (level >= 50) return "bg-mw-phosphor text-mw-phosphor bar-glow";
-  return "bg-mw-rust text-mw-rust bar-glow";
+  if (level >= 75) return "text-mw-phosphor";
+  if (level >= 50) return "text-mw-hazard";
+  return "text-mw-rust";
 }
 
 /** Rótulo de equipamiento según el dominio, en la jerga del selector de mechs. */
@@ -29,7 +29,7 @@ export default function TechStack() {
       <Panel
         id="skills"
         title="Stack"
-        aside={<span className="text-mw-phosphor">{String(techBadges.length).padStart(2, "0")}</span>}
+        aside={<span className="text-steam-dim">{String(techBadges.length).padStart(2, "0")}</span>}
       >
         <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
           {techBadges.map((badge, i) => {
@@ -66,25 +66,21 @@ export default function TechStack() {
         contrasta con el cian del resto.
       */}
       <Panel title="Equipamiento">
-        <div className="mw-field mw-frame text-mw-phosphorDim border border-mw-phosphorDim/40 p-4">
+        <div className="mw-field mw-frame text-mw-steel/70 border border-mw-steel/35 shadow-plate p-4">
           {skills.map((skill) => (
             <div key={skill.id} className="mb-3 last:mb-0">
               <div className="flex justify-between items-baseline gap-3 mb-1.5">
                 <span
                   data-text={skill.name}
-                  className="glitch font-mono text-[11.5px] uppercase tracking-[0.12em] text-mw-phosphor phosphor-glow truncate"
+                  className="glitch font-mono text-[11.5px] uppercase tracking-[0.12em] text-steam-bright truncate"
                 >
                   {skill.name}
                 </span>
-                <span className="shrink-0 font-mono text-[9px] uppercase tracking-widest text-mw-phosphor/60">
+                <span className="shrink-0 font-mono text-[9px] uppercase tracking-widest text-steam-dim">
                   {gradeFor(skill.level)} · {String(skill.level).padStart(3, "0")}
                 </span>
               </div>
-              <ProgressBar
-                value={skill.level}
-                className={barClassFor(skill.level)}
-                trackClassName="rounded-none bg-mw-fieldDeep border border-mw-phosphorDim/30"
-              />
+              <SegmentedBar value={skill.level} segments={20} className={barClassFor(skill.level)} />
             </div>
           ))}
         </div>

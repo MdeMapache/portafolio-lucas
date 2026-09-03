@@ -21,7 +21,7 @@ export default function BlockDivider({
 }) {
   return (
     <div className={`flex items-center gap-2.5 mb-4 ${className}`}>
-      <span aria-hidden className="font-mono text-[9px] text-mw-phosphor/60 shrink-0">
+      <span aria-hidden className="font-mono text-[9px] text-mw-steel/70 shrink-0">
         {"//"}
       </span>
 
@@ -29,7 +29,7 @@ export default function BlockDivider({
           bloque de contenido y así queda en el árbol de accesibilidad. */}
       <h3
         id={id}
-        className="hud-clip-sm bg-mw-phosphor/15 border border-mw-phosphor/35 px-2.5 py-1 shrink-0 font-mono text-[9.5px] uppercase tracking-[0.25em] text-mw-phosphor"
+        className="hud-clip-sm bg-mw-hazard/12 border border-mw-hazard/40 px-2.5 py-1 shrink-0 font-mono text-[9.5px] uppercase tracking-[0.25em] text-mw-hazard"
       >
         {label}
       </h3>
@@ -40,7 +40,7 @@ export default function BlockDivider({
         className="flex-1 h-3 min-w-0"
         style={{
           backgroundImage:
-            "repeating-linear-gradient(90deg, rgba(70,255,110,.35) 0 1px, transparent 1px 9px)",
+            "repeating-linear-gradient(90deg, rgba(95,140,168,.45) 0 1px, transparent 1px 9px)",
           backgroundPosition: "0 bottom",
           backgroundSize: "100% 6px",
           backgroundRepeat: "repeat-x",
@@ -48,7 +48,7 @@ export default function BlockDivider({
       />
 
       {count ? (
-        <span className="font-mono text-[9.5px] text-mw-phosphor/70 shrink-0 tabular-nums">
+        <span className="font-mono text-[9.5px] text-steam-dim shrink-0 tabular-nums">
           {count}
         </span>
       ) : null}

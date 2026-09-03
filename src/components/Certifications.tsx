@@ -14,7 +14,7 @@ export default function Certifications() {
   return (
     <Panel
       title="Certificaciones"
-      aside={<span className="text-mw-phosphor">{String(certifications.length).padStart(2, "0")}</span>}
+      aside={<span className="text-steam-dim">{String(certifications.length).padStart(2, "0")}</span>}
       bodyClassName="grid grid-cols-1 gap-2"
     >
       {certifications.map((cert, i) => {

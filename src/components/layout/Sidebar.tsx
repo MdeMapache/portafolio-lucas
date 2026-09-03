@@ -36,7 +36,7 @@ export default function Sidebar({
   const handle = `${profile.name.replace(/\s+/g, "").toUpperCase()}.EXE`;
 
   return (
-    <aside className="relative lg:sticky lg:top-0 lg:h-screen lg:w-[304px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-mw-phosphor/25 bg-mw-void/94 backdrop-blur-md">
+    <aside className="relative lg:sticky lg:top-0 lg:h-screen lg:w-[304px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-mw-steel/30 bg-mw-void/94 backdrop-blur-md">
       {/* Franja de peligro del borde. Vertical en escritorio, horizontal cuando
           el panel colapsa arriba. Va apagada: a intensidad plena compite con el
           contenido. */}
@@ -50,13 +50,13 @@ export default function Sidebar({
         <span
           key={pos}
           aria-hidden
-          className={`hud-rivet hidden lg:block absolute ${pos} w-1.5 h-1.5 bg-mw-phosphor/70 text-mw-phosphor/40 z-10`}
+          className={`hud-rivet hidden lg:block absolute ${pos} w-1.5 h-1.5 bg-mw-steel/70 text-mw-steel/40 z-10`}
         />
       ))}
 
       {/* Placa de identificación ------------------------------------------ */}
-      <div className="flex items-stretch border-b border-mw-phosphor/20">
-        <span className="hud-tab flex items-center bg-mw-phosphor/85 pl-4 pr-6 py-1.5">
+      <div className="flex items-stretch border-b border-mw-steel/25">
+        <span className="hud-tab flex items-center bg-mw-steel/90 pl-4 pr-6 py-1.5">
           <span className="font-mono text-[10px] font-bold text-mw-void tracking-[0.25em]">
             PILOTO
           </span>
@@ -73,19 +73,19 @@ export default function Sidebar({
       </div>
 
       {/* Identidad -------------------------------------------------------- */}
-      <div className="p-5 border-b border-mw-phosphor/15">
+      <div className="p-5 border-b border-mw-steel/20">
         <div className="flex lg:flex-col lg:items-start items-center gap-4">
           <div className="relative shrink-0">
             {/* El avatar va con esquinas recortadas y escuadras, como una ficha
                 de unidad y no como una foto de perfil cualquiera. */}
-            <div className="mw-frame text-mw-phosphor/60 relative w-[76px] h-[76px] lg:w-[108px] lg:h-[108px]">
-              <div className="hud-clip-sm w-full h-full border border-mw-phosphor/50 overflow-hidden bg-gradient-to-br from-mw-rust/40 to-mw-steel/40 flex items-center justify-center">
+            <div className="mw-frame text-mw-steel/60 relative w-[76px] h-[76px] lg:w-[108px] lg:h-[108px]">
+              <div className="hud-clip-sm w-full h-full border border-mw-steel/50 overflow-hidden bg-gradient-to-br from-mw-rust/40 to-mw-steel/40 flex items-center justify-center">
                 <AssetImage
                   assetId={profile.avatarAssetId}
                   alt={`Foto de perfil de ${profile.name}`}
                   className="w-full h-full object-cover"
                   fallback={
-                    <span className="font-display text-3xl text-mw-phosphor">
+                    <span className="font-display text-3xl text-mw-steelLight">
                       {profile.name.charAt(0) || "?"}
                     </span>
                   }
@@ -99,7 +99,7 @@ export default function Sidebar({
           </div>
 
           <div className="min-w-0 lg:mt-4">
-            <p className="font-mono text-[10px] tracking-[0.2em] text-mw-phosphor/70 mb-1">
+            <p className="font-mono text-[10px] tracking-[0.2em] text-mw-steelLight/80 mb-1">
               {handle}
             </p>
             <h1
@@ -216,7 +216,7 @@ export default function Sidebar({
       </nav>
 
       {/* Pie: acceso del dueño -------------------------------------------- */}
-      <div className="hidden lg:block border-t border-mw-phosphor/15">
+      <div className="hidden lg:block border-t border-mw-steel/20">
         <div className="flex items-center justify-between gap-2 p-3">
           {ready ? (
             isOwner ? (
@@ -224,7 +224,7 @@ export default function Sidebar({
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="hud-clip-sm flex-1 px-3 py-1.5 font-display text-[11px] uppercase tracking-widest border border-mw-phosphor/60 bg-mw-phosphor/10 text-mw-phosphor hover:bg-mw-phosphor/20 hover:shadow-glow-phosphor transition-all"
+                  className="hud-clip-sm flex-1 px-3 py-1.5 font-display text-[11px] uppercase tracking-widest border border-mw-hazard/60 bg-mw-hazard/12 text-mw-hazard hover:bg-mw-hazard/22 hover:shadow-glow-hazard transition-all"
                 >
                   Modificar
                 </button>
@@ -242,7 +242,7 @@ export default function Sidebar({
                 onClick={() => setSigningIn(true)}
                 aria-label="Iniciar sesión"
                 title="Acceso del dueño"
-                className="ml-auto font-mono text-[10px] text-steam-dim/40 hover:text-mw-phosphor transition-colors"
+                className="ml-auto font-mono text-[10px] text-steam-dim/40 hover:text-mw-hazard transition-colors"
               >
                 [ ACCESO ]
               </button>
@@ -253,7 +253,7 @@ export default function Sidebar({
         {/* Tira de estado, gemela de la del panel de sección. */}
         <div className="flex items-center gap-2 px-3 pb-2.5">
           <span aria-hidden className="hazard-stripe-dim h-[6px] flex-1 opacity-55" />
-          <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-mw-phosphor/40 shrink-0">
+          <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-steam-dim/70 shrink-0">
             unidad lista
           </span>
         </div>

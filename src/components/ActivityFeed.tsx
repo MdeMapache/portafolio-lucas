@@ -2,7 +2,7 @@
 
 import { usePortfolio } from "@/components/PortfolioProvider";
 import Panel from "@/components/ui/Panel";
-import ProgressBar from "@/components/ui/ProgressBar";
+import SegmentedBar from "@/components/ui/SegmentedBar";
 import { accentFor } from "@/components/ui/accents";
 import type { Project } from "@/lib/portfolio/types";
 
@@ -41,19 +41,15 @@ function ActivityRow({ project, index }: { project: Project; index: number }) {
           {String(project.done).padStart(2, "0")}/{String(project.total).padStart(2, "0")}
         </span>
         <div className="flex-1">
-          <ProgressBar
+          <SegmentedBar
             value={pct}
-            className={
-              complete
-                ? "bg-mw-hazard text-mw-hazard bar-glow"
-                : "bg-mw-phosphor text-mw-phosphor bar-glow"
-            }
-            trackClassName="rounded-none bg-mw-void/70 border border-mw-phosphor/15"
+            segments={16}
+            className={complete ? "text-mw-phosphor" : "text-mw-hazard"}
           />
         </div>
         <span
           className={`font-mono text-[9.5px] w-14 text-right ${
-            complete ? "text-mw-hazard" : "text-steam-dim"
+            complete ? "text-mw-phosphor" : "text-steam-dim"
           }`}
         >
           {complete ? "COMPLETO" : `${String(pct).padStart(3, "0")}%`}

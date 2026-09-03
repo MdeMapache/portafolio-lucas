@@ -72,23 +72,18 @@ export default function SectionRouter() {
           >
             <HudPanel code={meta?.code ?? ""} title={meta?.label ?? ""} hint={meta?.hint}>
               {/*
-                El contenido entra un instante después del marco, no junto con
-                él: primero se "enciende" la chapa y recién ahí aparece lo que
-                muestra. Encimar las dos cosas hace que la transición se lea
-                como un simple fundido.
+                El contenido entra un instante después del marco: primero se
+                "enciende" la chapa y recién ahí aparece lo que muestra.
+
+                La animación va en CSS y NO como un motion.div anidado. Un
+                motion sin `exit` dentro de otro que sí sale bloquea a
+                AnimatePresence en modo "wait": el padre espera que el hijo
+                confirme su salida, el hijo nunca lo hace, y el panel nuevo no
+                se monta nunca. Eso rompía la navegación por completo.
               */}
-              <motion.div
-                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: reduceMotion ? 0.15 : 0.35,
-                  delay: reduceMotion ? 0 : 0.14,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className={reduceMotion ? undefined : "holo-flicker"}
-              >
+              <div className={reduceMotion ? undefined : "hud-content-in"}>
                 <Panel />
-              </motion.div>
+              </div>
             </HudPanel>
           </motion.div>
         </AnimatePresence>

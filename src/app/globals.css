@@ -6,7 +6,7 @@
   base opaco para que nunca se vea el blanco del navegador detrás.
 */
 body {
-  background-color: #010603;
+  background-color: #0a0d10;
   color: #b8c9d9;
 }
 
@@ -32,7 +32,7 @@ body {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(70, 255, 110, 0.035) 50%,
+    rgba(95, 140, 168, 0.05) 50%,
     transparent 100%
   );
   height: 30%;
@@ -47,8 +47,8 @@ body {
 /* Textura de grilla, encima del fondo y debajo del contenido. */
 .bg-grid-overlay {
   background-image:
-    linear-gradient(rgba(70, 255, 110, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(70, 255, 110, 0.028) 1px, transparent 1px);
+    linear-gradient(rgba(95, 140, 168, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(95, 140, 168, 0.05) 1px, transparent 1px);
   background-size: 38px 38px;
 }
 
@@ -79,7 +79,7 @@ body {
 
 .glitch:hover::after {
   opacity: 0.85;
-  color: #46ff6e;
+  color: #5f8ca8;
   transform: translate(2px, 1px);
   animation: glitch-b 0.5s steps(2, end) infinite;
 }
@@ -113,9 +113,9 @@ body {
 /* Borde neón animado para el panel activo. */
 .holo-edge {
   box-shadow:
-    0 0 0 1px rgba(70, 255, 110, 0.35),
-    0 0 22px rgba(70, 255, 110, 0.12),
-    inset 0 0 40px rgba(70, 255, 110, 0.04);
+    0 0 0 1px rgba(95, 209, 122, 0.35),
+    0 0 22px rgba(232, 176, 32, 0.12),
+    inset 0 0 40px rgba(95, 140, 168, 0.05);
 }
 
 /* ── Proyector holográfico ────────────────────────────────────────────────
@@ -129,7 +129,7 @@ body {
    compuesto, así que funciona igual con el visor de PDF del navegador dentro.
    ──────────────────────────────────────────────────────────────────────── */
 .holo-tint {
-  filter: invert(1) sepia(1) hue-rotate(95deg) saturate(5) brightness(1.05) contrast(1.15);
+  filter: invert(1) sepia(1) hue-rotate(12deg) saturate(4) brightness(1.05) contrast(1.15);
 }
 
 /* Cono de luz que sale del emisor de abajo. El clip-path lo hace trapecio:
@@ -140,8 +140,8 @@ body {
   pointer-events: none;
   background: linear-gradient(
     0deg,
-    rgba(70, 255, 110, 0.22) 0%,
-    rgba(70, 255, 110, 0.07) 45%,
+    rgba(232, 176, 32, 0.22) 0%,
+    rgba(232, 176, 32, 0.07) 45%,
     transparent 85%
   );
   clip-path: polygon(42% 100%, 58% 100%, 100% 0%, 0% 0%);
@@ -161,8 +161,8 @@ body {
   pointer-events: none;
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(70, 255, 110, 0.11) 0px,
-    rgba(70, 255, 110, 0.11) 1px,
+    rgba(232, 176, 32, 0.12) 0px,
+    rgba(232, 176, 32, 0.12) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -179,7 +179,7 @@ body {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(70, 255, 110, 0.16) 45%,
+    rgba(232, 176, 32, 0.16) 45%,
     rgba(224, 112, 31, 0.08) 55%,
     transparent 100%
   );
@@ -206,8 +206,8 @@ body {
 
 /* Emisor: la barra encendida de la que "sale" la proyección. */
 .holo-emitter {
-  background: linear-gradient(90deg, transparent, #46ff6e 25%, #a5ffbc 50%, #46ff6e 75%, transparent);
-  box-shadow: 0 0 14px rgba(70, 255, 110, 0.75), 0 0 34px rgba(70, 255, 110, 0.35);
+  background: linear-gradient(90deg, transparent, #e8b020 25%, #ffd166 50%, #e8b020 75%, transparent);
+  box-shadow: 0 0 14px rgba(232, 176, 32, 0.75), 0 0 34px rgba(95, 209, 122, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -229,7 +229,7 @@ body {
    ──────────────────────────────────────────────────────────────────────── */
 
 .bg-preset-steam {
-  background: radial-gradient(ellipse at top, #0f5220 0%, #08300f 45%, #010603 100%);
+  background: radial-gradient(ellipse at top, #2b3540 0%, #171d24 45%, #0a0d10 100%);
 }
 
 .bg-preset-data {
@@ -249,8 +249,8 @@ body {
 .bg-preset-nebula {
   background:
     radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.4) 0%, transparent 45%),
-    radial-gradient(circle at 80% 70%, rgba(70, 255, 110, 0.28) 0%, transparent 45%),
-    linear-gradient(135deg, #12082e 0%, #010603 70%);
+    radial-gradient(circle at 80% 70%, rgba(95, 140, 168, 0.3) 0%, transparent 45%),
+    linear-gradient(135deg, #12082e 0%, #0a0d10 70%);
   background-size: 200% 200%, 200% 200%, 100% 100%;
   animation: bg-drift 24s ease-in-out infinite alternate;
 }
@@ -377,7 +377,7 @@ body {
   background: linear-gradient(
     100deg,
     transparent 20%,
-    rgba(70, 255, 110, 0.14) 50%,
+    rgba(232, 176, 32, 0.14) 50%,
     transparent 80%
   );
   transform: translateX(-110%);
@@ -472,7 +472,7 @@ body {
       transparent 1px,
       transparent 3px
     ),
-    linear-gradient(180deg, #0a2e12 0%, #04160a 100%);
+    linear-gradient(180deg, #1c2229 0%, #11161b 100%);
 }
 
 /*
@@ -653,4 +653,27 @@ body {
   .hud-caret {
     animation: none;
   }
+}
+
+/* ── Entrada del contenido del panel ─────────────────────────────────────
+   Va en CSS y NO como un motion.div anidado. Un motion sin `exit` dentro de
+   otro que sí sale bloquea a AnimatePresence en modo "wait": el padre espera
+   que el hijo confirme su salida, el hijo nunca lo hace, y el panel nuevo no
+   se monta jamás. Con una animación CSS sobre un div común el problema no
+   existe, y el efecto es el mismo: el marco se enciende primero y el contenido
+   entra 140 ms después.
+   ──────────────────────────────────────────────────────────────────────── */
+.hud-content-in {
+  animation: hud-content-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+}
+
+@keyframes hud-content-in {
+  0%   { opacity: 0; transform: translateY(12px); }
+  35%  { opacity: 0.55; }
+  55%  { opacity: 0.3; }
+  100% { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-content-in { animation: none; }
 }

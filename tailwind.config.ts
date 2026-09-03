@@ -1,16 +1,17 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Paleta Metal Warriors.
+ * Paleta industrial.
  *
- * La referencia son las pantallas de selección de unidades del juego: campo
- * verde saturado, texto en fósforo brillante, blindaje naranja óxido y franjas
- * de peligro amarillas, todo sobre canaletas negras.
+ * Antes todo era verde fósforo: texto, bordes, barras y divisores. Con el verde
+ * en la BASE, los acentos no se distinguían y el conjunto se leía monocromo.
  *
- * Los tokens `steam-*` conservan el nombre porque los usan ~20 componentes,
- * pero sus VALORES pasaron de azul a verde. Los antiguos `cyber-*` sí se
- * renombraron a `mw-*`: mantener un token llamado "cyan" que en realidad pinta
- * verde habría sido peor que el diff del renombrado.
+ * Acá el verde baja a color de estado —"esto está OK"— y la superficie pasa a
+ * ser acero: gunmetal, chapa fría, líneas de acero. Los acentos son de sala de
+ * máquinas: óxido, ámbar de advertencia y azul hidráulico.
+ *
+ * Los tokens `steam-*` conservan el nombre porque los usan casi todos los
+ * componentes; lo que cambia son los valores.
  */
 export default {
   content: ["./src/app/**/*.{ts,tsx}", "./src/components/**/*.{ts,tsx}"],
@@ -18,35 +19,39 @@ export default {
     extend: {
       colors: {
         steam: {
-          bgDeep: "#010603",
-          bgTop: "#0a2e12",
-          panel: "#04180a",
-          panel2: "#0a3d16",
-          line: "#1f9c40",
-          text: "#b6e8c2",
-          dim: "#5d9c6b",
-          bright: "#eafff0",
-          link: "#46ff6e",
-          linkHover: "#a5ffbc",
-          green: "#46ff6e",
-          gold: "#e8c020",
+          bgDeep: "#0a0d10",
+          bgTop: "#1a1f26",
+          panel: "#141a20",
+          panel2: "#232b34",
+          line: "#465260",
+          text: "#c2ccd6",
+          dim: "#7d8a97",
+          bright: "#eef3f8",
+          /** Los enlaces pasan a ámbar: en una sala de máquinas, lo que hay que
+              mirar está señalizado en ámbar, no en verde. */
+          link: "#e8901c",
+          linkHover: "#ffb347",
+          green: "#5fd17a",
+          gold: "#e8b020",
         },
         mw: {
-          /** Texto de terminal: el verde que usan los nombres de unidad. */
-          phosphor: "#46ff6e",
-          phosphorDim: "#1f9c40",
-          /** Blindaje de los mechs. */
-          rust: "#e0701f",
-          rustDeep: "#a83c12",
-          /** Franjas de advertencia. */
-          hazard: "#e8c020",
-          /** El azul violáceo del Ballistic, para la cuarta posición del ciclo. */
-          steel: "#7a72c4",
-          /** Campo verde de los paneles de selección. */
-          field: "#0a4a18",
-          fieldDeep: "#052a0c",
-          /** Canaletas entre paneles. */
-          void: "#010603",
+          /** Verde de estado. Más apagado que un fósforo de terminal: acá sólo
+              significa "operativo", no es el color del sitio. */
+          phosphor: "#5fd17a",
+          phosphorDim: "#2e7a44",
+          /** Óxido del blindaje. */
+          rust: "#d2601f",
+          rustDeep: "#8f3a10",
+          /** Ámbar de advertencia y franjas de peligro. */
+          hazard: "#e8b020",
+          /** Azul hidráulico: mangueras, líneas de presión. */
+          steel: "#5f8ca8",
+          steelLight: "#93b4c8",
+          /** Chapa: la superficie sobre la que se monta todo. */
+          field: "#1c2229",
+          fieldDeep: "#11161b",
+          /** Sombra entre piezas. */
+          void: "#0a0d10",
         },
       },
       fontFamily: {
@@ -55,10 +60,12 @@ export default {
         mono: ["var(--font-jetbrains)", "monospace"],
       },
       boxShadow: {
-        "glow-phosphor": "0 0 9px rgba(70,255,110,.5), inset 0 0 14px rgba(70,255,110,.08)",
-        "glow-rust": "0 0 9px rgba(224,112,31,.5), inset 0 0 14px rgba(224,112,31,.08)",
-        "glow-hazard": "0 0 9px rgba(232,192,32,.5), inset 0 0 14px rgba(232,192,32,.08)",
-        "glow-steel": "0 0 9px rgba(122,114,196,.5), inset 0 0 14px rgba(122,114,196,.08)",
+        "glow-phosphor": "0 0 9px rgba(95,209,122,.45), inset 0 0 14px rgba(95,209,122,.07)",
+        "glow-rust": "0 0 9px rgba(210,96,31,.5), inset 0 0 14px rgba(210,96,31,.08)",
+        "glow-hazard": "0 0 9px rgba(232,176,32,.5), inset 0 0 14px rgba(232,176,32,.08)",
+        "glow-steel": "0 0 9px rgba(95,140,168,.5), inset 0 0 14px rgba(95,140,168,.08)",
+        /** Relieve de chapa: luz arriba, sombra abajo. */
+        plate: "inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.5)",
       },
     },
   },

@@ -14,7 +14,7 @@ export default function Groups() {
   return (
     <Panel
       title="Redes y formación"
-      aside={<span className="text-mw-phosphor">{String(groups.length).padStart(2, "0")}</span>}
+      aside={<span className="text-steam-dim">{String(groups.length).padStart(2, "0")}</span>}
       bodyClassName="grid grid-cols-1 gap-2"
     >
       {groups.map((group, i) => {
