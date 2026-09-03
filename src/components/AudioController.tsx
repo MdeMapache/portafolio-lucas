@@ -225,8 +225,17 @@ export default function AudioController() {
 
   return (
     <>
-      {/* `loop` en el elemento y no en JS: el navegador reinicia sin corte. */}
-      <audio ref={audioRef} src="/audio/theme.mp3" loop preload="auto" />
+      {/*
+        `loop` en el elemento y no en JS: el navegador reinicia sin corte.
+
+        `preload="none"` y no "auto": con "auto" el navegador se bajaba los
+        2,4 MB de la pista apenas cargaba la página, aunque nadie fuera a
+        escucharla. Y casi nadie la escucha, porque el autoplay está bloqueado
+        hasta que hay un gesto del usuario (ver el estado `blocked`). Como la
+        reproducción siempre llega después de un clic, `play()` empieza a
+        bufferear en ese momento y la demora es imperceptible.
+      */}
+      <audio ref={audioRef} src="/audio/theme.mp3" loop preload="none" />
 
       <div className="fixed top-3 right-3 z-40 flex items-center gap-2.5 px-2.5 py-1.5 border border-mw-phosphor/30 bg-mw-void/85 backdrop-blur-md">
         {/* Silenciar ---------------------------------------------------- */}
