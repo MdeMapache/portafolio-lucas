@@ -32,7 +32,14 @@ export default function Sidebar({
   const handle = `${profile.name.replace(/\s+/g, "").toUpperCase()}.EXE`;
 
   return (
-    <aside className="lg:sticky lg:top-0 lg:h-screen lg:w-[300px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-cyber-cyan/20 bg-cyber-void/92 backdrop-blur-md">
+    <aside className="relative lg:sticky lg:top-0 lg:h-screen lg:w-[300px] shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-cyber-cyan/20 bg-cyber-void/92 backdrop-blur-md">
+      {/* Franja de peligro del borde, como la banda lateral del selector de
+          unidades. Vertical en escritorio, horizontal cuando el panel colapsa
+          arriba. Va apagada: a intensidad plena compite con el contenido. */}
+      <div
+        aria-hidden
+        className="hazard-stripe-dim absolute left-0 right-0 bottom-0 h-[3px] lg:left-auto lg:top-0 lg:bottom-0 lg:w-[3px] lg:h-auto"
+      />
       {/* Identidad ------------------------------------------------------- */}
       <div className="p-5 border-b border-cyber-cyan/15">
         <div className="flex lg:flex-col lg:items-start items-center gap-4">
@@ -99,7 +106,7 @@ export default function Sidebar({
                   : "border-transparent text-steam-dim hover:border-cyber-magenta hover:bg-cyber-magenta/5 hover:text-steam-bright"
               }`}
             >
-              <span className="flex items-baseline gap-2.5">
+              <span className="flex items-baseline gap-2">
                 <span
                   className={`font-mono text-[10px] ${
                     isActive ? "text-cyber-cyan" : "text-steam-dim/50 group-hover:text-cyber-magenta"
@@ -107,11 +114,34 @@ export default function Sidebar({
                 >
                   {section.code}
                 </span>
+
+                {/* Selector ◄ ► del menú de unidades de Metal Warriors: marca
+                    el elegido sin depender sólo del color de fondo. */}
+                <span
+                  aria-hidden
+                  className={`font-mono text-[10px] transition-opacity ${
+                    isActive
+                      ? "text-mw-phosphor phosphor-glow opacity-100"
+                      : "opacity-0 group-hover:opacity-40"
+                  }`}
+                >
+                  ◄
+                </span>
                 <span
                   data-text={section.label}
                   className="glitch font-display text-[13px] uppercase tracking-widest"
                 >
                   {section.label}
+                </span>
+                <span
+                  aria-hidden
+                  className={`font-mono text-[10px] transition-opacity ${
+                    isActive
+                      ? "text-mw-phosphor phosphor-glow opacity-100"
+                      : "opacity-0 group-hover:opacity-40"
+                  }`}
+                >
+                  ►
                 </span>
               </span>
               <span className="hidden lg:block font-mono text-[9.5px] text-steam-dim/50 mt-0.5 ml-[26px]">

@@ -433,3 +433,132 @@ body {
     height: 9px;
   }
 }
+
+/* ── Metal Warriors ───────────────────────────────────────────────────────
+   Motivos tomados de las pantallas de selección del juego: campo verde con
+   fósforo brillante, escuadras dobles y franjas de peligro. Se usan como
+   acento sobre la base ciberpunk, no como reemplazo.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Franja de peligro diagonal, como la banda lateral del selector de mechs. */
+.hazard-stripe {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #e0b91c 0px,
+    #e0b91c 9px,
+    #12100a 9px,
+    #12100a 18px
+  );
+}
+
+/* Versión apagada, para bordes largos donde el amarillo pleno cansaría. */
+.hazard-stripe-dim {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(224, 185, 28, 0.5) 0px,
+    rgba(224, 185, 28, 0.5) 7px,
+    rgba(4, 6, 12, 0.9) 7px,
+    rgba(4, 6, 12, 0.9) 14px
+  );
+}
+
+/* Campo verde de las pantallas de selección. */
+.mw-field {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(74, 255, 122, 0.05) 0px,
+      rgba(74, 255, 122, 0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(180deg, #0a2e12 0%, #04160a 100%);
+}
+
+/*
+  Escuadras dobles en las cuatro esquinas, más gruesas y angulares que las de
+  `corner-frame`. Se dibujan con gradientes sobre un único pseudo-elemento en
+  vez de cuatro nodos: `background-size` fija el tamaño de cada esquina y
+  `background-position` la ancla a su vértice.
+*/
+.mw-frame {
+  position: relative;
+}
+
+.mw-frame::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(currentColor, currentColor) top left / 14px 2px no-repeat,
+    linear-gradient(currentColor, currentColor) top left / 2px 14px no-repeat,
+    linear-gradient(currentColor, currentColor) top right / 14px 2px no-repeat,
+    linear-gradient(currentColor, currentColor) top right / 2px 14px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / 14px 2px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / 2px 14px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 14px 2px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / 2px 14px no-repeat;
+  opacity: 0.9;
+  transition: inset 0.2s ease;
+}
+
+/* Al enfocar, el marco se cierra sobre el contenido. */
+.group:hover > .mw-frame::after,
+.mw-frame:hover::after {
+  inset: 0px;
+}
+
+/* Parpadeo de fósforo para los rótulos de terminal. */
+.phosphor-glow {
+  text-shadow: 0 0 6px currentColor, 0 0 14px rgba(74, 255, 122, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mw-frame::after {
+    transition: none;
+  }
+}
+
+/* Fondo "Hangar": campo verde de terminal con rejilla técnica y una franja de
+   peligro anclada al borde inferior, como el piso de un hangar de mechs. */
+.bg-preset-hangar {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(224, 185, 28, 0.5) 0px,
+      rgba(224, 185, 28, 0.5) 8px,
+      rgba(10, 8, 4, 0.85) 8px,
+      rgba(10, 8, 4, 0.85) 16px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(74, 255, 122, 0.05) 0px,
+      rgba(74, 255, 122, 0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(74, 255, 122, 0.045) 0px,
+      rgba(74, 255, 122, 0.045) 1px,
+      transparent 1px,
+      transparent 56px
+    ),
+    linear-gradient(180deg, #0d3a17 0%, #071d0d 60%, #04160a 100%);
+  /* La franja sólo ocupa una banda al pie; el resto del apilado cubre todo. */
+  background-size: 100% 22px, 100% 100%, 100% 100%, 100% 100%;
+  background-position: bottom left, 0 0, 0 0, 0 0;
+  background-repeat: repeat-x, repeat, repeat, no-repeat;
+  animation: bg-hangar 9s linear infinite;
+}
+
+@keyframes bg-hangar {
+  from { background-position: bottom left, 0 0, 0 0, 0 0; }
+  to   { background-position: bottom 0 left 32px, 0 48px, 0 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-preset-hangar { animation: none; }
+}

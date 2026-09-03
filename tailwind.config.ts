@@ -30,6 +30,23 @@ export default {
           green: "#a3ff12",
           gold: "#ff2e97",
         },
+        /*
+          Paleta prestada de las pantallas de selección de Metal Warriors:
+          verde fósforo sobre campo verde oscuro, franjas de peligro amarillas
+          y el naranja oxidado del blindaje.
+
+          Convive con `cyber-*` en vez de reemplazarla: el cian y el magenta
+          siguen siendo la identidad del sitio, y esto entra donde la referencia
+          aporta — marcos de selección, listas de equipamiento, avisos.
+        */
+        mw: {
+          phosphor: "#4aff7a",
+          phosphorDim: "#1f8f3c",
+          field: "#0a2e12",
+          fieldDeep: "#04160a",
+          hazard: "#e0b91c",
+          rust: "#c2551f",
+        },
         cyber: {
           cyan: "#00f0ff",
           magenta: "#ff2e97",

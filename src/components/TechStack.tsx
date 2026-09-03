@@ -12,6 +12,14 @@ function barClassFor(level: number) {
   return "bg-cyber-magenta text-cyber-magenta bar-glow";
 }
 
+/** Rótulo de equipamiento según el dominio, en la jerga del selector de mechs. */
+function gradeFor(level: number) {
+  if (level >= 80) return "ÓPTIMO";
+  if (level >= 60) return "OPERATIVO";
+  if (level >= 40) return "ESTÁNDAR";
+  return "BÁSICO";
+}
+
 export default function TechStack() {
   const { data } = usePortfolio();
   const { techBadges, skills } = data;
@@ -51,25 +59,31 @@ export default function TechStack() {
         </div>
       </Panel>
 
-      <Panel title="Nivel de dominio">
-        <div className="space-y-3">
+      {/*
+        Lista de equipamiento, tomada del panel derecho del selector de unidades:
+        campo verde, fósforo brillante y una entrada por línea con su grado.
+        Es el único bloque del sitio en verde puro — funciona justamente porque
+        contrasta con el cian del resto.
+      */}
+      <Panel title="Equipamiento">
+        <div className="mw-field mw-frame text-mw-phosphorDim border border-mw-phosphorDim/40 p-4">
           {skills.map((skill) => (
-            <div key={skill.id}>
-              <div className="flex justify-between items-baseline mb-1.5">
+            <div key={skill.id} className="mb-3 last:mb-0">
+              <div className="flex justify-between items-baseline gap-3 mb-1.5">
                 <span
                   data-text={skill.name}
-                  className="glitch font-mono text-[11px] text-steam-bright tracking-wide"
+                  className="glitch font-mono text-[11.5px] uppercase tracking-[0.12em] text-mw-phosphor phosphor-glow truncate"
                 >
                   {skill.name}
                 </span>
-                <span className="font-mono text-[10px] text-steam-dim">
-                  {String(skill.level).padStart(3, "0")}%
+                <span className="shrink-0 font-mono text-[9px] uppercase tracking-widest text-mw-phosphor/60">
+                  {gradeFor(skill.level)} · {String(skill.level).padStart(3, "0")}
                 </span>
               </div>
               <ProgressBar
                 value={skill.level}
                 className={barClassFor(skill.level)}
-                trackClassName="rounded-none bg-cyber-void/70 border border-cyber-cyan/15"
+                trackClassName="rounded-none bg-mw-fieldDeep border border-mw-phosphorDim/30"
               />
             </div>
           ))}

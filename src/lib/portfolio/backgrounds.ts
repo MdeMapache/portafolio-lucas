@@ -52,6 +52,14 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
     swatch: "linear-gradient(180deg, #001b0e 0%, #00120a 100%)",
     animated: true,
   },
+  {
+    id: "hangar",
+    label: "Hangar",
+    className: "bg-preset-hangar",
+    swatch:
+      "repeating-linear-gradient(-45deg, #e0b91c 0 6px, #12100a 6px 12px), linear-gradient(180deg, #0a2e12, #04160a)",
+    animated: true,
+  },
 ];
 
 export const DEFAULT_BACKGROUND_ID = "steam-default";
