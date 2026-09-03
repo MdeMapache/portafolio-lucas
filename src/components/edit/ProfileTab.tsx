@@ -148,7 +148,7 @@ export default function ProfileTab() {
             type="checkbox"
             checked={profile.availableForWork}
             onChange={(e) => patchProfile({ availableForWork: e.target.checked })}
-            className="accent-steam-green w-4 h-4"
+            className="mech-check"
           />
           Disponible para trabajar
         </label>

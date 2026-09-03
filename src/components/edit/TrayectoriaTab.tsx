@@ -29,7 +29,7 @@ function CurrentToggle({
         type="checkbox"
         checked={end === null}
         onChange={(e) => onChange(e.target.checked ? null : String(new Date().getFullYear()))}
-        className="accent-steam-green"
+        className="mech-check"
       />
       Actualmente
     </label>

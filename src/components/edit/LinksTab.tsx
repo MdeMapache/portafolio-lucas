@@ -79,7 +79,7 @@ export default function LinksTab() {
                     type="checkbox"
                     checked={contact.online}
                     onChange={(e) => patchContact(contact.id, { online: e.target.checked })}
-                    className="accent-steam-green"
+                    className="mech-check"
                   />
                   activo
                 </label>
