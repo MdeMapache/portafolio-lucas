@@ -663,8 +663,15 @@ body {
    existe, y el efecto es el mismo: el marco se enciende primero y el contenido
    entra 140 ms después.
    ──────────────────────────────────────────────────────────────────────── */
+/*
+  `backwards` y NO `both`: con `both` el navegador retiene el último fotograma,
+  y un `transform: none` retenido se computa como `matrix(1,0,0,1,0,0)`. Una
+  matriz identidad SÍ crea bloque contenedor —`none` no—, así que cualquier
+  descendiente con `position: fixed` quedaba anclado acá en vez de al viewport.
+  Es lo que descolocaba el visor del CV.
+*/
 .hud-content-in {
-  animation: hud-content-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+  animation: hud-content-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.14s backwards;
 }
 
 @keyframes hud-content-in {
@@ -681,7 +688,7 @@ body {
 /* Encendido de la chapa al cambiar de sección. Reemplaza a la animación de
    entrada/salida de framer-motion: ver el comentario en SectionRouter. */
 .hud-panel-in {
-  animation: hud-panel-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hud-panel-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 @keyframes hud-panel-in {

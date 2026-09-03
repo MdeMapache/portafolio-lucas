@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import BlockDivider from "./ui/BlockDivider";
 import CvProjection from "./CvProjection";
+import Portal from "./ui/Portal";
 
 /**
  * Proyector holográfico del CV.
@@ -151,10 +152,14 @@ export default function CvHologram({ url }: { url: string | null }) {
 
       {/* Modo expandido --------------------------------------------------- */}
       {open && url ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-3 sm:p-8"
-          onClick={() => setOpen(false)}
-        >
+        // Portal obligatorio: un ancestro con transform —incluida una matriz
+        // identidad retenida por una animación— ancla el position:fixed a él en vez
+        // al viewport, y el visor aparecía cortado y fuera de alcance.
+        <Portal>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-3 sm:p-8"
+            onClick={() => setOpen(false)}
+          >
           <div
             role="dialog"
             aria-modal="true"
@@ -214,8 +219,9 @@ export default function CvHologram({ url }: { url: string | null }) {
             </div>
 
             <span aria-hidden className="block h-px holo-emitter shrink-0" />
+            </div>
           </div>
-        </div>
+        </Portal>
       ) : null}
     </section>
   );
