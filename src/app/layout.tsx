@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Oswald, Inter, JetBrains_Mono } from "next/font/google";
-import AudioController from "@/components/AudioController";
 import { AuthProvider } from "@/components/AuthProvider";
 import BackgroundLayer from "@/components/BackgroundLayer";
+import HudControls from "@/components/HudControls";
 import { PortfolioProvider } from "@/components/PortfolioProvider";
+import { TEXT_SCALE_INIT_SCRIPT } from "@/components/TextScaleController";
 import { getProfileForMetadata, getSiteUrl } from "@/lib/portfolio/profileServer";
 import "./globals.css";
 
@@ -65,10 +66,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    /*
+      `suppressHydrationWarning`: el script de abajo escribe `style="--ts:…"` en
+      este mismo elemento antes de que React hidrate, así que el HTML del
+      servidor y el del cliente difieren a propósito. Sin esto, React avisa de
+      un desajuste que en realidad es el comportamiento buscado. Sólo silencia
+      este nodo, no el árbol.
+    */
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${oswald.variable} ${inter.variable} ${jetbrains.variable} font-body min-h-screen`}
       >
+        {/*
+          Aplica la escala de texto guardada ANTES de pintar. Sin esto, quien la
+          dejó en 130% ve la página cargar en 100% y pegar un salto al hidratar.
+
+          Va como <script> crudo y primer hijo del body, no como <Script
+          strategy="beforeInteractive">: se comprobó que esa estrategia deja el
+          código sólo en el payload de RSC, o sea que lo ejecuta React al
+          hidratar y el salto ocurre igual. Un script inline lo corre el parser
+          en cuanto lo encuentra, antes de leer el resto del documento.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: TEXT_SCALE_INIT_SCRIPT }} />
         {/*
           AuthProvider va por fuera porque quién sos no depende del contenido,
           pero el contenido sí depende de quién sos (qué controles se muestran).
@@ -78,9 +97,10 @@ export default function RootLayout({
         <AuthProvider>
           <PortfolioProvider>
             <BackgroundLayer />
-            {/* Fuera de la página: el control es global y no debe remontarse
-                al cambiar de sección, o la música se cortaría en cada clic. */}
-            <AudioController />
+            {/* Fuera de la página: los controles son globales y no deben
+                remontarse al cambiar de sección, o la música se cortaría en
+                cada clic. */}
+            <HudControls />
             {children}
           </PortfolioProvider>
         </AuthProvider>

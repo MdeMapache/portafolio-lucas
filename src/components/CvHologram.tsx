@@ -55,9 +55,20 @@ function Overlays({ beam = true }: { beam?: boolean }) {
   );
 }
 
+/**
+ * Zoom del documento expandido.
+ *
+ * El control de tamaño de texto del sitio no llega hasta acá: el CV es un
+ * canvas, no texto, así que necesita su propia forma de agrandarse. `1` es
+ * ajustar al ancho del visor; de ahí para arriba aparece scroll horizontal.
+ */
+const ZOOM_STEPS = [1, 1.25, 1.5, 1.75, 2] as const;
+
 export default function CvHologram({ url }: { url: string | null }) {
   const [open, setOpen] = useState(false);
   const [tinted, setTinted] = useState(true);
+  const [zoomIndex, setZoomIndex] = useState(0);
+  const zoom = ZOOM_STEPS[zoomIndex];
 
   useEffect(() => {
     if (!open) return;
@@ -165,9 +176,9 @@ export default function CvHologram({ url }: { url: string | null }) {
             aria-modal="true"
             aria-label="Curriculum Vitae"
             onClick={(e) => e.stopPropagation()}
-            className="holo-edge relative w-full max-w-3xl h-[90vh] flex flex-col bg-mw-void border border-mw-phosphor/40"
+            className="holo-edge relative w-full max-w-5xl h-[90vh] flex flex-col bg-mw-void border border-mw-phosphor/40"
           >
-            <header className="flex items-center gap-3 px-4 py-2.5 border-b border-mw-phosphor/25 shrink-0">
+            <header className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5 border-b border-mw-phosphor/25 shrink-0">
               <span
                 data-text="Curriculum Vitae"
                 className="glitch font-display text-[13px] uppercase tracking-widest text-mw-phosphor"
@@ -176,6 +187,35 @@ export default function CvHologram({ url }: { url: string | null }) {
               </span>
 
               <div className="ml-auto flex items-center gap-3.5">
+                {/* Zoom del documento ------------------------------------- */}
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setZoomIndex((i) => Math.max(0, i - 1))}
+                    disabled={zoomIndex === 0}
+                    aria-label="Alejar"
+                    className="w-5 h-5 flex items-center justify-center border border-mw-phosphor/40
+                               text-mw-phosphor leading-none transition-colors
+                               enabled:hover:bg-mw-phosphor/15 disabled:opacity-30 disabled:cursor-default"
+                  >
+                    −
+                  </button>
+                  <span className="font-mono text-[9.5px] w-8 text-center tabular-nums text-steam-dim">
+                    {Math.round(zoom * 100)}%
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setZoomIndex((i) => Math.min(ZOOM_STEPS.length - 1, i + 1))}
+                    disabled={zoomIndex === ZOOM_STEPS.length - 1}
+                    aria-label="Acercar"
+                    className="w-5 h-5 flex items-center justify-center border border-mw-phosphor/40
+                               text-mw-phosphor leading-none transition-colors
+                               enabled:hover:bg-mw-phosphor/15 disabled:opacity-30 disabled:cursor-default"
+                  >
+                    +
+                  </button>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => setTinted((v) => !v)}
@@ -211,8 +251,10 @@ export default function CvHologram({ url }: { url: string | null }) {
             <div className="relative flex-1 min-h-0 bg-black">
               {/* El scroll va en una capa propia para que las escuadras y las
                   líneas de barrido queden fijas y no se desplacen con el PDF. */}
-              <div className="absolute inset-0 overflow-y-auto">
-                <CvProjection url={url} tinted={tinted} allPages className="w-full" />
+              {/* `overflow-auto` y no sólo vertical: con zoom por encima de
+                  100% el documento es más ancho que el visor. */}
+              <div className="absolute inset-0 overflow-auto">
+                <CvProjection url={url} tinted={tinted} allPages zoom={zoom} className="w-full" />
               </div>
               <Overlays beam={false} />
               <Brackets />

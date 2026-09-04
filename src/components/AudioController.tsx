@@ -237,7 +237,9 @@ export default function AudioController() {
       */}
       <audio ref={audioRef} src="/audio/theme.mp3" loop preload="none" />
 
-      <div className="fixed top-3 right-3 z-40 flex items-center gap-2.5 px-2.5 py-1.5 border border-mw-phosphor/30 bg-mw-void/85 backdrop-blur-md">
+      {/* El posicionamiento lo pone <HudControls/>, que agrupa este control con
+          el de tamaño de texto en una sola barra. */}
+      <div className="flex items-center gap-2.5 px-2.5 py-1.5 border border-mw-phosphor/30 bg-mw-void/85 backdrop-blur-md">
         {/* Silenciar ---------------------------------------------------- */}
         <button
           type="button"

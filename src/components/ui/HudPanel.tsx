@@ -96,7 +96,10 @@ export default function HudPanel({
         {/* Tira de estado --------------------------------------------------- */}
         <footer className="flex items-center gap-3 px-4 sm:px-7 py-1.5 border-t border-mw-steel/25">
           <span aria-hidden className="hazard-stripe-dim h-[7px] flex-1 opacity-60" />
-          <span className="font-mono text-[8.5px] uppercase tracking-[0.2em] text-steam-dim shrink-0">
+          {/* Sin `shrink-0`: con la escala de texto al máximo esta leyenda no
+              entra en un teléfono, y al no poder encogerse empujaba el ancho de
+              todo el documento. Ahora envuelve en dos líneas. */}
+          <span className="font-mono text-[8.5px] uppercase tracking-[0.2em] text-steam-dim text-right">
             sistema operativo · enlace estable
           </span>
           <span aria-hidden className="hazard-stripe-dim h-[7px] w-12 opacity-60" />

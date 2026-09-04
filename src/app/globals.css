@@ -10,6 +10,62 @@ body {
   color: #b8c9d9;
 }
 
+/* ── Escala de texto ──────────────────────────────────────────────────────
+   El sitio tiene ~150 tamaños de fuente escritos en píxeles literales
+   (`text-[9.5px]`, `text-[13px]`…). Eso tiene dos consecuencias: la primera es
+   que la configuración de tamaño de fuente del navegador no hacía absolutamente
+   nada acá; la segunda, que para poder escalarlos habría que editar los ~150
+   usos repartidos en 31 archivos.
+
+   La salida es redefinir las clases que genera Tailwind en vez de cambiar el
+   marcado. Tailwind emite sus utilidades dentro de `@layer utilities`, y en la
+   cascada CSS una regla SIN capa le gana a cualquiera que esté dentro de una
+   —sin importar el orden ni la especificidad—. Así que estas reglas ganan
+   siempre, no se toca ningún .tsx, y con `--ts: 1` el sitio se ve idéntico a
+   antes por construcción.
+
+   Sólo se redefine `font-size`: el `line-height` que Tailwind pone en las
+   clases con nombre sigue viniendo de la regla original.
+
+   Ojo si se agrega un tamaño nuevo en algún componente: hay que sumarlo acá o
+   ese texto queda fuera de la escala. La lista sale de:
+     grep -rhoE "text-\[[0-9.]+px\]" --include=*.tsx src/ | sort -u
+   ──────────────────────────────────────────────────────────────────────── */
+/*
+  Valor de fábrica: 1.1. Es lo que ve quien entra por primera vez y nunca toca
+  el control, que es casi todo el mundo. Se subió de 1 a 1.1 porque el tamaño
+  original resultó chico para lectores reales.
+
+  Tiene que coincidir con `DEFAULT_SCALE` en components/TextScaleController.tsx,
+  o el sitio se vería a un tamaño y el control mostraría otro.
+*/
+:root {
+  --ts: 1.1;
+}
+
+.text-\[8px\]    { font-size: calc(8px * var(--ts)); }
+.text-\[8\.5px\] { font-size: calc(8.5px * var(--ts)); }
+.text-\[9px\]    { font-size: calc(9px * var(--ts)); }
+.text-\[9\.5px\] { font-size: calc(9.5px * var(--ts)); }
+.text-\[10px\]   { font-size: calc(10px * var(--ts)); }
+.text-\[10\.5px\]{ font-size: calc(10.5px * var(--ts)); }
+.text-\[11px\]   { font-size: calc(11px * var(--ts)); }
+.text-\[11\.5px\]{ font-size: calc(11.5px * var(--ts)); }
+.text-\[12px\]   { font-size: calc(12px * var(--ts)); }
+.text-\[12\.5px\]{ font-size: calc(12.5px * var(--ts)); }
+.text-\[13px\]   { font-size: calc(13px * var(--ts)); }
+.text-\[13\.5px\]{ font-size: calc(13.5px * var(--ts)); }
+.text-\[14px\]   { font-size: calc(14px * var(--ts)); }
+.text-\[15px\]   { font-size: calc(15px * var(--ts)); }
+
+.text-xs   { font-size: calc(0.75rem * var(--ts)); }
+.text-sm   { font-size: calc(0.875rem * var(--ts)); }
+.text-base { font-size: calc(1rem * var(--ts)); }
+.text-lg   { font-size: calc(1.125rem * var(--ts)); }
+.text-xl   { font-size: calc(1.25rem * var(--ts)); }
+.text-2xl  { font-size: calc(1.5rem * var(--ts)); }
+.text-3xl  { font-size: calc(1.875rem * var(--ts)); }
+
 /* ── Scanlines CRT ────────────────────────────────────────────────────────
    Va como capa fija con pointer-events:none sobre todo. Deliberadamente sutil:
    a más opacidad el texto se vuelve ilegible en pantallas chicas.

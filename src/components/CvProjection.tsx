@@ -30,6 +30,17 @@ type RenderedPage = {
 /** Límite de resolución: por encima de 2x el costo sube y no se nota. */
 const MAX_DPR = 2;
 
+/**
+ * Techo de resolución del mapa de bits, en múltiplos del ancho del contenedor.
+ *
+ * Sin este techo el zoom multiplica el área del canvas al cuadrado: a 2x con
+ * una pantalla de dpr 2 saldrían mapas de bits de 4x el ancho, y como además se
+ * guarda una copia sin teñir de cada página para poder alternar el tinte, la
+ * memoria se dispara a cientos de megas. Acotando el producto `zoom * dpr`, el
+ * costo queda constante y sólo se resigna algo de nitidez en los zooms altos.
+ */
+const MAX_RASTER = 2.5;
+
 /** Margen extra alrededor de cada imagen, para que no le quede un halo teñido. */
 const BOX_PAD = 2;
 
@@ -131,12 +142,19 @@ export default function CvProjection({
   url,
   tinted,
   allPages = false,
+  zoom = 1,
   className = "",
 }: {
   url: string;
   tinted: boolean;
   /** `false` rinde sólo la primera página, para la vista previa. */
   allPages?: boolean;
+  /**
+   * Ancho del documento en múltiplos del contenedor. `1` es "ajustar al ancho".
+   * Por encima de 1 el canvas se desborda y hay que dejar que el contenedor
+   * haga scroll horizontal.
+   */
+  zoom?: number;
   className?: string;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -167,8 +185,15 @@ export default function CvProjection({
         const doc = await pdfjs.getDocument(url).promise;
         if (cancelled) return;
 
-        const width = host.clientWidth || 640;
+        // Ancho de la caja disponible, y ancho al que se va a mostrar el
+        // documento una vez aplicado el zoom.
+        const hostWidth = host.clientWidth || 640;
+        const cssWidth = hostWidth * zoom;
+
         const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+        // Píxeles de mapa de bits por píxel CSS, acotado por MAX_RASTER.
+        const density = Math.max(1, Math.min(dpr, MAX_RASTER / zoom));
+
         const total = allPages ? doc.numPages : 1;
         const rendered: RenderedPage[] = [];
 
@@ -177,12 +202,16 @@ export default function CvProjection({
           if (cancelled) return;
 
           const unscaled = page.getViewport({ scale: 1 });
-          const viewport = page.getViewport({ scale: (width / unscaled.width) * dpr });
+          const viewport = page.getViewport({
+            scale: (cssWidth / unscaled.width) * density,
+          });
 
           const canvas = document.createElement("canvas");
           canvas.width = Math.floor(viewport.width);
           canvas.height = Math.floor(viewport.height);
-          canvas.className = "block w-full";
+          canvas.className = "block";
+          // El alto se deduce solo de la relación de aspecto del mapa de bits.
+          canvas.style.width = `${cssWidth}px`;
 
           const ctx = canvas.getContext("2d", { willReadFrequently: true });
           if (!ctx) throw new Error("sin contexto 2d");
@@ -213,7 +242,7 @@ export default function CvProjection({
     return () => {
       cancelled = true;
     };
-  }, [url, allPages]);
+  }, [url, allPages, zoom]);
 
   // Tinte. Se recalcula desde los píxeles originales, así que alternarlo no
   // degrada la imagen por aplicar el filtro dos veces.
