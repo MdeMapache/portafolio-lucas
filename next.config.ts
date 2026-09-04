@@ -28,10 +28,26 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Los .wasm y .pck de Godot son inmutables por build: conviene
-        // cachearlos fuerte para que el demo no se descargue entero cada vez.
+        /*
+          El .wasm y el .pck pesan 50 MB juntos, así que conviene que el
+          navegador los reutilice entre visitas.
+
+          Acá había `immutable, max-age=31536000` con el argumento de que son
+          inmutables por build. Es falso: no llevan hash en el nombre. Cada
+          export nuevo pisa `index.pck` con el mismo nombre, así que la URL no
+          cambia. Y `immutable` significa literalmente "no vuelvas a preguntar":
+          el navegador no revalida ni con recarga normal. Resultado: cualquiera
+          que hubiera abierto la demo se quedaba con esa versión hasta un año,
+          y publicar un nivel nuevo no llegaba a nadie.
+
+          `must-revalidate` conserva la copia local y sólo pregunta si cambió.
+          Si no cambió, la respuesta es un 304 sin cuerpo: los 50 MB no se
+          vuelven a bajar. Son un par de cientos de bytes por visita a cambio de
+          que la demo se pueda actualizar, que es el único comportamiento
+          aceptable para un archivo que se sobrescribe.
+        */
         source: "/demos/:path*.(wasm|pck|zip)",
-        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }],
       },
     ];
   },
