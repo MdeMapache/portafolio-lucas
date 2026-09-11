@@ -294,6 +294,8 @@
   .quest[data-cat="Trabajo"]   { border-left-color: #4a80a8; }
   .quest[data-cat="Hogar"]     { border-left-color: var(--moss); }
   .quest[data-cat="Mini Boss"] { border-left-color: var(--blood); }
+  /* La marca de jefe es independiente de la categoria, igual que en la app. */
+  .quest[data-boss="1"]        { border-left-color: var(--blood); }
   .quest.vencida { opacity: .62; border-left-color: var(--blood) !important; }
   .quest.hecha   { opacity: .45; }
   .quest.hecha .q-title { text-decoration: line-through; color: var(--ink-dim); }
@@ -384,6 +386,11 @@
     width: 32px; height: 32px; flex: none; display: grid; place-items: center;
     border: 1px solid var(--edge-soft); border-radius: var(--r);
     background: rgba(0,0,0,.32); font-size: 16px;
+  }
+  /* Los sprites son pixel art de 16x16: al ampliarlos hay que apagar el
+     suavizado o se ven borrosos. */
+  .item .glyph img {
+    width: 22px; height: 22px; image-rendering: pixelated;
   }
   .item h3 { font-size: 12.5px; font-weight: 600; color: var(--parchment); }
   .item p { font-size: 10.5px; color: var(--ink-dim); line-height: 1.4; margin-top: 2px; }
@@ -597,51 +604,66 @@ const DIFICULTADES = {
   "Épica":    { xp: 140, oro: 95, dmg: 300 },
 };
 
+/*
+  Catálogo de la tienda. Es copia fiel de `kCatalogoTienda` en
+  lib/features/home/data/models/stats_model.dart: mismos ids, precios,
+  descripciones y comportamiento automático. Si allá cambia algo, acá también.
+
+  `sprite` apunta al pixel art de 16x16 del proyecto original; cuando falta —el
+  Reloj de Arena no tiene— se cae al emoji, igual que hace el widget ItemIcono.
+*/
 const TIENDA = [
   {
     id: "sello_mercenario",
-    glyph: "🗡️",
+    glyph: "📜",
+    sprite: "img/items/sello_mercenario.png",
     nombre: "Sello de Mercenario",
-    precio: 120,
+    precio: 250,
     desc: "Completa un contrato al instante desde el inventario sin otorgar oro ni experiencia.",
     usoDesc: "El mercenario hará el trabajo por ti. No ganarás Oro ni Experiencia.",
   },
   {
-    id: "reloj_cronomante",
-    glyph: "⏳",
+    id: "reloj_arena",
+    glyph: "⌛",
     nombre: "Reloj de Arena del Cronomante",
-    precio: 260,
+    precio: 400,
     desc: "Revive un contrato vencido automáticamente. Restaura el 100% de oro y experiencia.",
     auto: true,
   },
   {
-    id: "brebaje_concentracion",
+    id: "pocion_enana",
     glyph: "🧪",
-    nombre: "Brebaje de la Concentración",
-    precio: 180,
-    desc: "Duplica la XP ganada, pero reduce a 0 el oro obtenido durante las próximas 3 misiones.",
-  },
-  {
-    id: "pocion_preentreno",
-    glyph: "⚗️",
+    sprite: "img/items/pocion_entrenamiento.png",
     nombre: "Poción de Pre-Entrenamiento",
-    precio: 150,
-    desc: "Otorga un bono plano de +50 de daño extra al Jefe en misiones de la categoría Gimnasio.",
+    precio: 300,
+    desc: "El próximo ataque contra un Mini Boss infligirá daño crítico duplicado (x2).",
+    auto: true,
   },
   {
-    id: "colmillo_critico",
-    glyph: "🦷",
-    nombre: "Colmillo del Jabalí",
+    id: "piedra_afilar",
+    glyph: "🪨",
+    sprite: "img/items/piedra_afilar.png",
+    nombre: "Piedra de Afilar del Cazador",
+    precio: 350,
+    desc: "Otorga un bono plano de +50 de daño extra al Jefe en misiones de la categoría Gimnasio.",
+    auto: true,
+  },
+  {
+    id: "brebaje_concentracion",
+    glyph: "🍺",
+    sprite: "img/items/brebaje_concentracion.png",
+    nombre: "Brebaje de la Concentración",
     precio: 200,
-    desc: "El próximo ataque contra un Mini Boss infligirá daño crítico duplicado (x2).",
+    desc: "Duplica la XP ganada, pero reduce a 0 el oro obtenido durante las próximas 3 misiones.",
+    auto: true,
   },
 ];
 
 /* Los códigos de la DEV CONSOLE estaban en el binario, en TiendaPage. */
 const COMANDOS = {
-  GREEDISGOOD: { oro: 500,  msg: "+500 de oro. El tabernero no pregunta." },
-  MOTHERLODE:  { oro: 1000, msg: "+1000 de oro. La veta era buena." },
-  ROBINHOOD:   { oro: 250, xp: 250, msg: "+250 de oro y +250 de fama." },
+  GREEDISGOOD: { oro: 500,   msg: "+500 de oro en la bóveda." },
+  MOTHERLODE:  { oro: 10000, msg: "+10000 de oro. Toda la reserva es tuya." },
+  ROBINHOOD:   { oro: 1000, xp: 250, msg: "+1000 de oro y +250 XP repartidos." },
 };
 
 const COLUMNAS = [
@@ -667,7 +689,10 @@ const PESTANAS = [
    Estado
    ══════════════════════════════════════════════════════════════════════════ */
 
-const CLAVE = "tavernquest.demo.v1";
+/* v2: cambiaron los ids de los objetos al sincronizar el catálogo con la app.
+   Subir la versión descarta la partida vieja en vez de dejar una mochila con
+   claves que ya no existen. */
+const CLAVE = "tavernquest.demo.v2";
 let uid = 0;
 const nid = () => "q" + (++uid) + "-" + Math.random().toString(36).slice(2, 7);
 
@@ -685,11 +710,13 @@ function estadoInicial() {
     fogataViva: true,
     jefesCaidos: 3,
     boss: { nivel: 4, hp: 620, max: 900 },
-    mochila: { sello_mercenario: 1, reloj_cronomante: 0, brebaje_concentracion: 0, pocion_preentreno: 0, colmillo_critico: 0 },
+    mochila: { sello_mercenario: 1, reloj_arena: 0, pocion_enana: 0, piedra_afilar: 0, brebaje_concentracion: 0 },
     ajustes: { vibracion: true, notificaciones: true, hardcore: false },
     misiones: [
+      /* Gimnasio Y contrato jefe a la vez: es el único escenario donde la
+         Piedra de Afilar suma, así que conviene que exista de entrada. */
       { id: nid(), titulo: "Rutina de empuje", desc: "Pecho, hombro y tríceps.", cat: "Gimnasio", dif: "Ardua",
-        vence: enHoras(6), col: "forja", hecha: false,
+        esBoss: true, vence: enHoras(6), col: "forja", hecha: false,
         fases: [ {t:"Calentamiento", ok:true}, {t:"4×8 press banca", ok:true}, {t:"Accesorios", ok:false} ] },
       { id: nid(), titulo: "Terminar el informe de arquitectura", desc: "Diagramas + capítulo de riesgos.", cat: "Trabajo", dif: "Épica",
         vence: enHoras(29), col: "forja", hecha: false,
@@ -743,6 +770,25 @@ const el = (tag, props = {}, ...hijos) => {
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+/**
+ * Ícono de un objeto: el sprite pixel art si lo tiene, y si no el emoji.
+ *
+ * Reproduce el widget ItemIcono del proyecto original, incluido el respaldo
+ * cuando la imagen no carga: así un sprite faltante degrada al emoji en vez de
+ * dejar el hueco roto.
+ */
+function iconoItem(it) {
+  const caja = el("div", { className: "glyph" });
+  if (!it.sprite) {
+    caja.textContent = it.glyph;
+    return caja;
+  }
+  const img = el("img", { src: it.sprite, alt: "", loading: "lazy" });
+  img.onerror = () => { caja.textContent = it.glyph; };
+  caja.append(img);
+  return caja;
+}
+
 const vencida = (q) => !q.hecha && q.vence < Date.now();
 
 /** El texto del QuestCountdown original: cuánto falta, o cuánto lleva vencida. */
@@ -759,13 +805,25 @@ function restante(ms) {
   return d < 0 ? "vencida hace " + t : "faltan " + t;
 }
 
+/*
+  Igual que el getter `esMiniBoss` de quest_model.dart: la marca de jefe es
+  independiente de la categoría. Eso permite que una misión sea de Gimnasio Y
+  contrato jefe a la vez, que es justo el único caso donde la Piedra de Afilar
+  sirve para algo.
+*/
+function esMiniBoss(q) {
+  return q.esBoss === true || q.cat === "Mini Boss";
+}
+
 function recompensa(q) {
   const base = DIFICULTADES[q.dif] || DIFICULTADES.Normal;
   const brebaje = S.mochila.brebaje_concentracion > 0;
   return {
     xp:  brebaje ? base.xp * 2 : base.xp,
     oro: brebaje ? 0 : base.oro,
-    dmg: base.dmg + (q.cat === "Gimnasio" && S.mochila.pocion_preentreno > 0 ? 50 : 0),
+    // La Piedra de Afilar es una mejora permanente: suma mientras esté en la
+    // mochila y no se descuenta al usarse.
+    dmg: base.dmg + (q.cat === "Gimnasio" && S.mochila.piedra_afilar > 0 ? 50 : 0),
   };
 }
 
@@ -819,10 +877,11 @@ function completar(q, ancla) {
   if (!vencida(q)) { S.racha++; S.fogataViva = true; }
 
   let golpe = 0;
-  if (q.cat === "Mini Boss") {
+  if (esMiniBoss(q)) {
     golpe = r.dmg;
-    if (S.mochila.colmillo_critico > 0) { golpe *= 2; S.mochila.colmillo_critico--; }
-    if (q.cat === "Gimnasio" && S.mochila.pocion_preentreno > 0) S.mochila.pocion_preentreno--;
+    // La Poción duplica el golpe con el bono de la Piedra ya incluido —ese es
+    // el orden de quest_repository_impl.dart— y ésta sí se consume.
+    if (S.mochila.pocion_enana > 0) { golpe *= 2; S.mochila.pocion_enana--; }
     S.boss.hp = Math.max(0, S.boss.hp - golpe);
   }
 
@@ -876,8 +935,8 @@ function revisarVencidos() {
   for (const q of S.misiones) {
     if (vencida(q) && !q.avisada) {
       q.avisada = true;
-      if (S.mochila.reloj_cronomante > 0) {
-        S.mochila.reloj_cronomante--;
+      if (S.mochila.reloj_arena > 0) {
+        S.mochila.reloj_arena--;
         q.vence = enHoras(24);
         q.avisada = false;
         revividos++;
@@ -952,6 +1011,29 @@ function dialogoCrear() {
   addBtn.onclick = agregarFase;
   nuevaFase.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); agregarFase(); } });
 
+  /*
+    Marca de contrato jefe. En la app es un interruptor aparte de la categoría
+    (ver crear_mision_dialog.dart), no un valor de la lista, y por eso una
+    misión puede ser de Gimnasio y contar como jefe al mismo tiempo.
+  */
+  let esBoss = false;
+  const bossBtn = el("button", { className: "act ghost", type: "button", textContent: "Apagado" });
+  bossBtn.onclick = () => {
+    esBoss = !esBoss;
+    bossBtn.className = "act" + (esBoss ? "" : " ghost");
+    bossBtn.textContent = esBoss ? "Activado" : "Apagado";
+  };
+  const bossFila = el("div", { className: "panel", style: "margin-top:2px" },
+    el("div", { style: "display:flex;align-items:center;gap:9px" },
+      el("div", { style: "flex:1;min-width:0" },
+        el("h3", { textContent: "Invocar contrato jefe", style: "font-size:12.5px" }),
+        el("p", {
+          textContent: 'Completa misiones de tipo "Mini Boss" para hacer daño.',
+          style: "font-size:10.5px;color:var(--ink-dim);margin-top:2px;line-height:1.35",
+        }),
+      ), bossBtn),
+  );
+
   const cuerpo = el("div", {},
     el("label", { className: "f" }, el("span", { textContent: "Título de la Misión" }), titulo),
     el("label", { className: "f" }, el("span", { textContent: "Descripción del Contrato (Opcional)" }), desc),
@@ -965,6 +1047,7 @@ function dialogoCrear() {
     ),
     el("label", { className: "f" }, el("span", { textContent: "Fases de la misión" }),
       el("div", { className: "fase-add" }, nuevaFase, addBtn), lista),
+    bossFila,
   );
 
   const cancelar = el("button", { className: "act ghost", type: "button", textContent: "Cancelar" });
@@ -974,13 +1057,13 @@ function dialogoCrear() {
   invocar.onclick = () => {
     const t = titulo.value.trim();
     if (!t) { avisar("El tablón exige un título", true); titulo.focus(); return; }
-    if (cat.value === "Mini Boss" && fases.length === 0) {
+    if ((esBoss || cat.value === "Mini Boss") && fases.length === 0) {
       avisar("Agrega al menos 1 fase para invocar al Jefe automáticamente.", true); return;
     }
     const cuando = new Date(fecha.value + "T" + (hora.value || "23:59")).getTime();
     S.misiones.unshift({
       id: nid(), titulo: t, desc: desc.value.trim(),
-      cat: cat.value, dif: dif.value,
+      cat: cat.value, dif: dif.value, esBoss,
       vence: Number.isFinite(cuando) ? cuando : enHoras(24),
       col: "backlog", hecha: false,
       fases: fases.map((f) => ({ t: f, ok: false })),
@@ -1089,6 +1172,7 @@ function tarjetaQuest(q) {
     ),
   );
   tarjeta.dataset.cat = q.cat;
+  if (esMiniBoss(q)) tarjeta.dataset.boss = "1";
 
   if (q.fases.length) {
     const cont = el("div", { className: "fases" });
@@ -1135,7 +1219,7 @@ function vistaMesa() {
       );
       c.dataset.id = q.id;
       c.style.borderLeftColor = getComputedStyle(document.documentElement)
-        .getPropertyValue(q.cat === "Mini Boss" ? "--blood" : "--edge") || "";
+        .getPropertyValue(esMiniBoss(q) ? "--blood" : "--edge") || "";
       c.addEventListener("dragstart", (e) => {
         e.dataTransfer.setData("text/plain", q.id);
         e.dataTransfer.effectAllowed = "move";
@@ -1229,7 +1313,7 @@ function vistaTienda() {
     };
     frag.append(el("div", { className: "panel", style: "margin-bottom:6px" },
       el("div", { className: "item" },
-        el("div", { className: "glyph", textContent: it.glyph }),
+        iconoItem(it),
         el("div", { style: "flex:1;min-width:0" },
           el("h3", { textContent: it.nombre }),
           el("p", { textContent: it.desc }),
@@ -1301,7 +1385,7 @@ function vistaInventario() {
 
     frag.append(el("div", { className: "panel", style: "margin-bottom:6px" },
       el("div", { className: "item" },
-        el("div", { className: "glyph", textContent: it.glyph }),
+        iconoItem(it),
         el("div", { style: "flex:1;min-width:0" },
           el("h3", { textContent: it.nombre + "  ×" + n }),
           el("p", { textContent: it.usoDesc || it.desc }),
