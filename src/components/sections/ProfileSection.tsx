@@ -31,7 +31,7 @@ const DOSSIER = [
     code: "SEC",
     title: "Ciberseguridad",
     grade: "diplomado",
-    body: "Diplomado en Ciberseguridad en Duoc UC, cursado entre 2025 y 2026. La formación se traduce en cómo escribo: validación del lado del servidor antes que del cliente, credenciales fuera del bundle, y permisos que se imponen en la base y no escondiendo botones en la interfaz.",
+    body: "Diplomado en Ciberseguridad en Duoc UC (2025–2026), en cuatro módulos: ciberseguridad en la organización, defensiva, ofensiva y gestión. Defensa en profundidad por capas según los frameworks y el contexto de la empresa; descubrimiento de activos y explotación de vulnerabilidades sobre máquinas virtuales para dimensionar el riesgo y armar el plan de mitigación; y respuesta a incidentes con playbooks. Se traduce en cómo escribo: validación del lado del servidor antes que del cliente, credenciales fuera del bundle, y permisos que se imponen en la base y no escondiendo botones en la interfaz.",
   },
   {
     code: "DAT",
