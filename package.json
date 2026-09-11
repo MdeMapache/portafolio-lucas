@@ -9,7 +9,8 @@
     "lint": "eslint",
     "check:supabase": "node scripts/check-supabase.mjs",
     "demo:exportar": "node scripts/exportar-demo.mjs",
-    "demo:sellar": "node scripts/sellar-demo.mjs"
+    "demo:sellar": "node scripts/sellar-demo.mjs",
+    "tavernquest:exportar": "node scripts/exportar-tavernquest.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
