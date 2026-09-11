@@ -39,9 +39,12 @@ export async function getProfileForMetadata(): Promise<ProfileMeta> {
     const res = await fetch(`${url}/rest/v1/portfolio?select=document&id=eq.1`, {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
       signal: AbortSignal.timeout(TIMEOUT_MS),
-      // Una hora de caché: el perfil cambia poco y así no se consulta la base
-      // en cada visita sólo para armar el <head>.
-      next: { revalidate: 3600 },
+      // Cinco minutos de caché. Estuvo en una hora, y el razonamiento era que
+      // el perfil cambia poco; lo que no consideré es que cuando cambia suele
+      // ser porque lo vas a compartir, y esperar una hora a que el título del
+      // enlace se ponga al día no sirve de nada. Doce consultas por hora a una
+      // fila no le pesan a nadie.
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) return FALLBACK;
