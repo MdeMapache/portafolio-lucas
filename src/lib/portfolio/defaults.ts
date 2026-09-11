@@ -12,12 +12,12 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
   version: SCHEMA_VERSION,
 
   profile: {
-    name: "Mapache",
-    role: "Desarrollador Frontend & Game Dev",
+    name: "Lucas-Figueroa",
+    role: "Desarrollador Full-stack & Game Dev",
     location: "Quilpué, Chile",
     level: 18,
     tags: ["HTML / CSS / JS", "ANGULAR + IONIC", "GODOT", "TYPESCRIPT"],
-    bio: "Ingeniero Informático (Duoc UC) con foco en desarrollo Full-Stack, móvil y videojuegos, con un diplomado en Ciberseguridad. Me gusta el código limpio, la arquitectura modular y aprender herramientas nuevas.",
+    bio: "Ingeniero Informático (Duoc UC) con foco en desarrollo Full-Stack, móvil y videojuegos. Diplomado en Ciberseguridad terminado. Me gusta el código limpio, la arquitectura modular y aprender herramientas nuevas.",
     avatarAssetId: null,
     availableForWork: true,
   },
