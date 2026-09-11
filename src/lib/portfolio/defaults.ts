@@ -13,7 +13,7 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
 
   profile: {
     name: "Lucas-Figueroa",
-    role: "Desarrollador Full-stack & Game Dev",
+    role: "Desarrollador de Software",
     location: "Quilpué, Chile",
     level: 18,
     tags: ["HTML / CSS / JS", "ANGULAR + IONIC", "GODOT", "TYPESCRIPT"],
