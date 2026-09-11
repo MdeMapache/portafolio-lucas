@@ -5,27 +5,26 @@ const nextConfig: NextConfig = {
     return [
       {
         /*
-          Aislamiento de origen SÓLO para los demos autohospedados.
+          Acá vivían `Cross-Origin-Opener-Policy: same-origin` y
+          `Cross-Origin-Embedder-Policy: require-corp`, para dar aislamiento de
+          origen a un export de Godot con hilos, que necesita SharedArrayBuffer.
 
-          Godot 4 exporta a web con hilos por defecto, y eso usa
-          SharedArrayBuffer, que el navegador únicamente habilita en documentos
-          "cross-origin isolated". Estas dos cabeceras lo consiguen.
+          Se fueron porque nunca sirvieron: un documento aislado tampoco puede
+          embeberse en un iframe cuyo padre no lo esté, así que la demo se
+          exporta SIN hilos desde el principio (ver public/demos/README.md). No
+          habilitaban nada.
 
-          Va acotado a /demos/ a propósito: aplicar COEP require-corp a todo el
-          sitio bloquearía las imágenes de Supabase Storage, que se sirven desde
-          otro origen sin cabecera CORP. Sería cambiar un problema por otro.
+          Y sí rompían algo. `require-corp` bloquea cualquier subrecurso
+          cross-origin sin cabecera CORP, incluidos los scripts que cargan los
+          SDK de Google: con la demo de TavernQuest —que es la app Flutter real
+          contra Firebase— el navegador cortaba pedidos con
+          ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoep.
 
-          Aun con esto, un build CON hilos no se puede embeber en un iframe
-          desde una página que no esté aislada. Para que el demo se vea dentro
-          del portafolio hay que exportar SIN hilos. Ver public/demos/README.md.
+          Queda sólo CORP, que es lo que permite que el portafolio embeba sus
+          propias demos en un iframe.
         */
         source: "/demos/:path*",
-        headers: [
-          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
-          // Permite que el propio portafolio lo embeba.
-          { key: "Cross-Origin-Resource-Policy", value: "same-site" },
-        ],
+        headers: [{ key: "Cross-Origin-Resource-Policy", value: "same-site" }],
       },
       {
         /*
